@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Awezome Vacation Vouchers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #priceDisplay {
+      font-size: 18px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Awezome Vacation Vouchers</h1>
+
+    <label for="search">🔍 Search Destination</label>
+    <input type="text" id="search" placeholder="Start typing a country or city..." />
+
+    <label for="country">🌍 Select Country / Region</label>
+    <select id="country">
+      <option value="">Select Country</option>
+    </select>
+
+    <label for="city">🏙️ Select Destination</label>
+    <select id="city">
+      <option value="">Select Destination</option>
+    </select>
+
+    <label for="promo">🎟️ Promo Code (optional)</label>
+    <input type="text" id="promo" placeholder="Enter promo code if you have one" />
+
+    <div id="priceDisplay">Voucher Price: $0</div>
+
+    <button id="payBtn">Pay with Card / Apple Pay</button>
+  </div>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    const stripe = Stripe("pk_test_51SpY0dAFSky0SUusN92eSoSNNNBJo36ARt4tZ4ZSRhg4Geejy78Mk3Sto6nYH6EwhUuKCjPhmLq14Ts71QG5Q00j7dd2B8P");
+    const backendUrl = "https://awezomevouchers-backend.vercel.app";
+
+    const countrySelect = document.getElementById("country");
+    const citySelect = document.getElementById("city");
+    const promoInput = document.getElementById("promo");
+    const priceDisplay = document.getElementById("priceDisplay");
+    const searchBox = document.getElementById("search");
+    const payBtn = document.getElementById("payBtn");
+
+    const destinations = {
+      "Special Vouchers": [
+        "3 Days, 2 Nights All-Inclusive Voucher (3 Days, 2 Nights)",
+        "7-Night Villa Voucher (8 Days, 7 Nights)"
+      ],
+      "Cruise Vacations": [
+        "Cruise Vacation (3–14 Days Available)"
+      ],
+      "United States": [
+        "Atlanta (4 Days, 3 Nights)",
+        "Boston (4 Days, 3 Nights)",
+        "Chicago (4 Days, 3 Nights)",
+        "Las Vegas (4 Days, 3 Nights)",
+        "Los Angeles (4 Days, 3 Nights)",
+        "Miami (4 Days, 3 Nights)",
+        "New York City (4 Days, 3 Nights)",
+        "Orlando (4 Days, 3 Nights)",
+        "Phoenix (4 Days, 3 Nights)",
+        "San Diego (4 Days, 3 Nights)",
+        "San Francisco (4 Days, 3 Nights)",
+        "Washington DC (4 Days, 3 Nights)"
+      ]
+    };
+
+    // Populate countries
+    for (const country in destinations) {
+      const opt = document.createElement("option");
+      opt.value = country;
+      opt.textContent = country;
+      countrySelect.appendChild(opt);
+    }
+
+    // Populate cities when country changes
+    countrySelect.addEventListener("change", () => {
+      citySelect.innerHTML = "<option value=''>Select Destination</option>";
+      const selected = destinations[countrySelect.value] || [];
+      selected.forEach(city => {
+        const opt = document.createElement("option");
+        opt.value = city;
+        opt.textContent = city;
+        citySelect.appendChild(opt);
+      });
+    });
+
+    // Smart search for countries or cities
+    searchBox.addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+      countrySelect.innerHTML = "<option value=''>Select Country</option>";
+
+      for (const country in destinations) {
+        const hasMatch = country.toLowerCase().includes(query) || destinations[country].some(city => city.toLowerCase().includes(query));
+        if (hasMatch) {
+          const opt = document.createElement("option");
+          opt.value = country;
+          opt.textContent = country;
+          countrySelect.appendChild(opt);
+        }
+      }
+    });
+
+    payBtn.addEventListener("click", async () => {
+      const country = countrySelect.value;
+      const city = citySelect.value;
+      const promo = promoInput.value;
+
+      if (!country || !city) {
+        alert("Please select a country and destination first.");
+        return;
+      }
+
+      const res = await fetch(`${backendUrl}/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ country, city, promo })
+      });
+
+      const data = await res.json();
+      if (data.sessionId) {
+        stripe.redirectToCheckout({ sessionId: data.sessionId });
+      } else {
+        alert("Something went wrong with payment setup.");
+      }
+    });
+  </script>
+</body>
+</html>
