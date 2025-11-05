@@ -170,7 +170,7 @@
 
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-  // Backend URL - UPDATE THIS to your backend domain if different
+  // Backend URL - UPDATE THIS if needed
   const backendURL = "https://awezomevouchers-backend.vercel.app";
 
   // YOUR STRIPE PUBLISHABLE KEY
@@ -486,8 +486,8 @@
   populateCountries();
   updateDisplayedPrice();
 
-  // Payment handler
-  payBtn.addEventListener("click", async () => {
+  // DEBUG PAYMENT BUTTON CODE
+  payBtn.addEventListener("click", async ()=>{
     const country = countrySelect.value;
     const city = citySelect.value;
     const name = document.getElementById("name").value.trim();
@@ -495,6 +495,9 @@
     const phone = document.getElementById("phone").value.trim();
     const promo = document.getElementById("promo").value.trim();
     const price = computePrice(country);
+
+    console.log("Form data:", { country, city, name, email, phone, promo, price });
+    console.log("Backend URL:", backendURL);
 
     if (!country || !city || !email) {
       alert("Please choose country, destination and enter an email.");
@@ -513,6 +516,8 @@
     payBtn.classList.add('loading');
 
     try {
+      console.log("Sending request to backend...");
+      
       const response = await fetch(`${backendURL}/api/create-checkout-session`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -527,25 +532,31 @@
         })
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response OK?", response.ok);
+      
       const data = await response.json();
+      console.log("Response data:", data);
       
       if (!response.ok) {
         console.error("Backend returned error:", data);
-        alert("Error: " + (data.error || "Unable to process payment"));
+        alert("Error: " + (data.error || "Check console for details"));
         resetPayButton();
         return;
       }
 
       if (data.url) {
-        // Redirect to Stripe Checkout
+        console.log("Redirecting to Stripe checkout...");
         window.location.href = data.url;
       } else {
-        alert("Unexpected response from server.");
+        alert("No payment URL received");
         resetPayButton();
       }
     } catch (error) {
-      console.error("Network error contacting backend:", error);
-      alert("Network error. Please check your connection and try again.");
+      console.error("Network error details:", error);
+      console.error("Error type:", error.name);
+      console.error("Error message:", error.message);
+      alert("Cannot connect to payment service. Please try again later.");
       resetPayButton();
     }
   });
