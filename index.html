@@ -173,8 +173,8 @@
   // Backend URL - UPDATE THIS to your backend domain if different
   const backendURL = "https://awezomevouchers-backend.vercel.app";
 
-  // Replace with your publishable key (this can be public)
-  const STRIPE_PUBLISHABLE_KEY = "pk_test_51SPYOdAfSKyDUssUW29eSSoNNNBb3A6RR4TdZ4Z3Srhg4Geejvy78Wk35to6nYHH6EwhUkxCjPMnlq14fsTI7QGS000j7dd2b8";
+  // YOUR STRIPE PUBLISHABLE KEY
+  const STRIPE_PUBLISHABLE_KEY = "pk_live_51SPYOXA2x8asxal3vfIdkyNdFM9mFs3aaGXbNNgV7ue1G5LjDhywmFkW4qAraNMNhJgRBKjNSS3QBzx5lX6WcTtD00WLa7KIxy";
   const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
   // ---------- ALL DESTINATIONS (139 Total) ----------
@@ -493,6 +493,7 @@
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
+    const promo = document.getElementById("promo").value.trim();
     const price = computePrice(country);
 
     if (!country || !city || !email) {
@@ -515,7 +516,15 @@
       const response = await fetch(`${backendURL}/api/create-checkout-session`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ country, city, name, email, phone, price })
+        body: JSON.stringify({ 
+          country, 
+          city, 
+          name, 
+          email, 
+          phone, 
+          promo,
+          price 
+        })
       });
 
       const data = await response.json();
