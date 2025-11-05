@@ -242,8 +242,6 @@
 
   citySelect.addEventListener("change", updateDisplayedPrice);
   promoInput.addEventListener("input", updateDisplayedPrice);
-
-  const backendURL = "https://awezomevouchers-backend.vercel.app";
   payBtn.addEventListener("click", async ()=>{
     payBtn.disabled = true;
     const country = countrySelect.value;
