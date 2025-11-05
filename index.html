@@ -14,9 +14,6 @@
     button{background:#0070f3;color:#fff;border:0;padding:12px}
     button:disabled{opacity:.5}
     p.note{margin-top:10px;font-size:13px;color:#666}
-    .row{display:flex;gap:10px}
-    .row > *{flex:1}
-    #search{margin-bottom:8px}
   </style>
 </head>
 <body>
@@ -35,250 +32,130 @@
     <label for="promo">Promo code (optional)</label>
     <input id="promo" placeholder="Enter promo code" />
 
+    <label for="name">Full Name</label>
+    <input id="name" placeholder="Enter your name" />
+
+    <label for="email">Email</label>
+    <input id="email" placeholder="Enter your email" />
+
+    <label for="phone">Phone Number</label>
+    <input id="phone" placeholder="Enter your phone number" />
+
     <div id="priceDisplay">Voucher Price: $0</div>
 
     <button id="payBtn">Pay with Card / Apple Pay</button>
-    <p class="note">If Apple Pay doesn't appear on your device, customers can also pay via your external channels.</p>
+    <p class="note">If Apple Pay doesn't appear, you can still pay via card checkout.</p>
   </div>
 
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-  // CONFIG: (paste your publishable key and backend)
   const STRIPE_PUBLISHABLE_KEY = "pk_test_51SPYOdAfSKyDUssUW29eSSoNNNBb3A6RR4TdZ4Z3Srhg4Geejvy78Wk35to6nYHH6EwhUkxCjPMnlq14fsTI7QGS000j7dd2b8";
-  const backendURL = "https://awezomevouchers-backend.vercel.app"; // <-- your backend
+  const backendURL = "https://awezomevouchers-backend.vercel.app";
 
   const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
-  // ---- DESTINATIONS object ----
-  // Add / edit entries here if you need more destinations.
-  // The format: "Country": ["City (X Days, Y Nights)", ...]
   const destinations = {
-    "Special Vouchers":[
-      "7-Night Villa Voucher (8 Days, 7 Nights)",
-      "3 Days, 2 Nights All-Inclusive Voucher (3 Days, 2 Nights)"
-    ],
-    "Cruise Destinations":["Cruise Vacation (3-14 Days Available)"],
-    "Argentina":["Buenos Aires (5 Days, 4 Nights)"],
-    "Australia":[
-      "Brisbane, QLD (4 Days, 3 Nights)",
-      "Cairns, QLD (4 Days, 3 Nights)",
-      "Darwin, NT (4 Days, 3 Nights)",
-      "Gold Coast, QLD (4 Days, 3 Nights)",
-      "Mackay, QLD (4 Days, 3 Nights)",
-      "Melbourne, VIC (4 Days, 3 Nights)",
-      "Perth, WA (4 Days, 3 Nights)",
-      "Rockhampton, QLD (4 Days, 3 Nights)",
-      "Sydney, NSW (4 Days, 3 Nights)",
-      "Townsville, QLD (4 Days, 3 Nights)"
-    ],
-    "Belgium":["Brussels (4 Days, 3 Nights)"],
-    "Brazil":["Rio de Janeiro (5 Days, 4 Nights)"],
-    "Canada":[
-      "Calgary (4 Days, 3 Nights)",
-      "Edmonton (4 Days, 3 Nights)",
-      "Halifax (4 Days, 3 Nights)",
-      "Montreal (4 Days, 3 Nights)",
-      "Niagara Falls (4 Days, 3 Nights)",
-      "Ottawa (4 Days, 3 Nights)",
-      "Quebec (4 Days, 3 Nights)",
-      "Revelstoke (4 Days, 3 Nights)",
-      "Toronto (4 Days, 3 Nights)",
-      "Vancouver (4 Days, 3 Nights)",
-      "Victoria (4 Days, 3 Nights)",
-      "Winnipeg (4 Days, 3 Nights)"
-    ],
-    "China":["Beijing (5 Days, 4 Nights)"],
-    "France":["Cannes (4 Days, 3 Nights)","Paris (5 Days, 4 Nights)"],
-    "Germany":["Berlin (4 Days, 3 Nights)","Munich (5 Days, 4 Nights)"],
-    "India":["Goa (5 Days, 4 Nights)"],
-    "Italy":["Amalfi Coast (5 Days, 4 Nights)","Florence (5 Days, 4 Nights)","Rome (5 Days, 4 Nights)"],
-    "Japan":["Kyoto (6 Days, 5 Nights)"],
-    "Mexico":["Cancun (6 Days, 5 Nights)","Cabo San Lucas (5 Days, 4 Nights)","Puerto Vallarta (6 Days, 5 Nights)"],
-    "New Zealand":["Auckland (5 Days, 4 Nights)","Bay Of Plenty & Rotorua (5 Days, 4 Nights)","Christchurch (5 Days, 4 Nights)"],
-    "Philippines":["Boracay (5 Days, 4 Nights)"],
-    "Singapore":["Singapore (5 Days, 4 Nights)"],
-    "South Africa":["Cape Town (5 Days, 4 Nights)"],
-    "Spain":["Barcelona (5 Days, 4 Nights)","Madrid (5 Days, 4 Nights)"],
-    "Thailand":["Bangkok (5 Days, 4 Nights)","Phuket (8 Days, 7 Nights)","Koh Samui (8 Days, 7 Nights)"],
-    "Turkey":["Antalya (4 Days, 3 Nights)","Istanbul (5 Days, 4 Nights)"],
-    "United Kingdom":["Edinburgh (4 Days, 3 Nights)","London (4 Days, 3 Nights)","Glasgow (4 Days, 3 Nights)"],
-    "United States":[
-      "Atlanta (4 Days, 3 Nights)","Boston (4 Days, 3 Nights)","Branson (4 Days, 3 Nights)","Cape Cod (4 Days, 3 Nights)",
-      "Chicago (4 Days, 3 Nights)","Daytona Beach (4 Days, 3 Nights)","Denver (4 Days, 3 Nights)","Fort Lauderdale (4 Days, 3 Nights)",
-      "Galveston (4 Days, 3 Nights)","Gatlinburg (4 Days, 3 Nights)","Grand Canyon (4 Days, 3 Nights)","Hawaii (6 Days, 5 Nights)",
-      "Las Vegas (4 Days, 3 Nights)","Los Angeles (4 Days, 3 Nights)","Miami (4 Days, 3 Nights)","Nashville (4 Days, 3 Nights)",
-      "New Orleans (4 Days, 3 Nights)","New York City (4 Days, 3 Nights)","North Carolina (8 Days, 7 Nights)","Ocean City (4 Days, 3 Nights)",
-      "Orlando (4 Days, 3 Nights)","Palm Springs (4 Days, 3 Nights)","Panama City (4 Days, 3 Nights)","Phoenix (4 Days, 3 Nights)",
-      "San Antonio (4 Days, 3 Nights)","San Diego (4 Days, 3 Nights)","San Francisco (4 Days, 3 Nights)","San Juan (5 Days, 4 Nights)",
-      "Savannah (4 Days, 3 Nights)","Sedona (4 Days, 3 Nights)","St. Petersburg (4 Days, 3 Nights)","Virginia Beach (4 Days, 3 Nights)",
-      "Washington DC (8 Days, 7 Nights)"
-    ]
-    // Add more countries & cities as needed
+    "United States": ["New York (4 Days, 3 Nights)", "Miami (4 Days, 3 Nights)", "Los Angeles (4 Days, 3 Nights)", "Las Vegas (4 Days, 3 Nights)"],
+    "France": ["Paris (5 Days, 4 Nights)"],
+    "Japan": ["Tokyo (6 Days, 5 Nights)"],
+    "Australia": ["Sydney (4 Days, 3 Nights)", "Melbourne (4 Days, 3 Nights)"],
+    "Brazil": ["Rio de Janeiro (5 Days, 4 Nights)"],
   };
 
-  // ---- DOM references ----
   const countrySelect = document.getElementById("country");
   const citySelect = document.getElementById("city");
+  const searchBox = document.getElementById("search");
   const promoInput = document.getElementById("promo");
   const priceDisplay = document.getElementById("priceDisplay");
-  const searchBox = document.getElementById("search");
   const payBtn = document.getElementById("payBtn");
 
-  // compute client-side price rules (mirrors backend pricing)
-  function computeClientPrice(country, city, promo) {
-    let base = 75;
-    if (country === "Special Vouchers" || country === "Cruise Destinations" || country === "Cruise Vacations") base = 100;
-    if (!promo) return base;
-    const p = promo.trim().toLowerCase();
-    if (p === "thats50" && base === 75) return 50;
-    if (p === "thats75" && base === 100) return 75;
-    if (p === "thatsfamily") return Math.round(base * 0.5);
-    return base;
-  }
-
-  // populate country list alphabetically
-  function populateCountryList(filterFn) {
-    const keys = Object.keys(destinations).sort((a,b)=>a.localeCompare(b));
+  function populateCountries() {
     countrySelect.innerHTML = "<option value=''>Select Country / Region</option>";
-    keys.forEach(country=>{
-      if (!filterFn || filterFn(country)) {
-        const o = document.createElement("option");
-        o.value = country;
-        o.textContent = country;
-        countrySelect.appendChild(o);
-      }
+    Object.keys(destinations).forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      countrySelect.appendChild(opt);
     });
   }
 
-  // populate city list for a given country
-  function populateCityList(country) {
+  function populateCities(country) {
     citySelect.innerHTML = "<option value=''>Select Destination</option>";
-    if (!country) return;
-    const cities = (destinations[country] || []).slice().sort((a,b)=>a.localeCompare(b));
-    cities.forEach(c=>{
-      const o = document.createElement("option");
-      o.value = c;
-      o.textContent = c;
-      citySelect.appendChild(o);
-    });
+    if (destinations[country]) {
+      destinations[country].forEach(city => {
+        const opt = document.createElement("option");
+        opt.value = city;
+        opt.textContent = city;
+        citySelect.appendChild(opt);
+      });
+    }
   }
 
-  // update displayed price
-  function updateDisplayedPrice() {
+  function computePrice(country) {
+    let price = 75;
+    if (country === "Special Vouchers") price = 100;
+    return price;
+  }
+
+  function updatePrice() {
     const country = countrySelect.value;
-    const city = citySelect.value;
-    const promo = promoInput.value.trim();
-    const price = computeClientPrice(country, city, promo);
+    const price = computePrice(country);
     priceDisplay.textContent = `Voucher Price: $${price}`;
   }
 
-  // search box - filters countries when typing country or city
-  searchBox.addEventListener("input", (e)=>{
-    const q = e.target.value.trim().toLowerCase();
-    if (!q) { populateCountryList(); return; }
-    populateCountryList(country=>{
-      if (country.toLowerCase().includes(q)) return true;
-      return (destinations[country] || []).some(city => city.toLowerCase().includes(q));
+  searchBox.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const matches = Object.keys(destinations).filter(c => 
+      c.toLowerCase().includes(q) ||
+      destinations[c].some(city => city.toLowerCase().includes(q))
+    );
+    countrySelect.innerHTML = "<option value=''>Select Country / Region</option>";
+    matches.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      countrySelect.appendChild(opt);
     });
   });
 
-  // events
-  countrySelect.addEventListener("change", ()=>{
-    populateCityList(countrySelect.value);
-    updateDisplayedPrice();
+  countrySelect.addEventListener("change", () => {
+    populateCities(countrySelect.value);
+    updatePrice();
   });
-  citySelect.addEventListener("change", updateDisplayedPrice);
-  promoInput.addEventListener("input", updateDisplayedPrice);
+  citySelect.addEventListener("change", updatePrice);
+  promoInput.addEventListener("input", updatePrice);
 
-  // Initialize
-  populateCountryList();
-  updateDisplayedPrice();
+  populateCountries();
+  updatePrice();
 
-  // Single payment handler
   payBtn.addEventListener("click", async () => {
+    const country = countrySelect.value;
+    const city = citySelect.value;
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    if (!country || !city || !email) {
+      alert("Please complete all required fields.");
+      return;
+    }
     payBtn.disabled = true;
     try {
-      const country = countrySelect.value;
-      const city = citySelect.value;
-      const promo = promoInput.value.trim();
-      if (!country) { alert("Please choose a country/region."); payBtn.disabled = false; return; }
-      if (!city) { alert("Please choose a destination."); payBtn.disabled = false; return; }
-
-      const price = computeClientPrice(country, city, promo);
-
-      // POST to backend to create checkout session
-      const payload = {
-        price,
-        name: (document.getElementById("name")?.value) || "Customer",
-        email: (document.getElementById("email")?.value) || "none@none.com",
-        phone: (document.getElementById("phone")?.value) || "N/A",
-        country,
-        city,
-        promo
-      };
-
       const response = await fetch(`${backendURL}/api/create-checkout-session`, {
         method: "POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({country, city, name, email, phone, price: computePrice(country)})
       });
-
-      // Try to parse JSON, but if not JSON, show raw text for debugging.
-      let json;
-      try { json = await response.clone().json(); } catch(err) { json = null; }
-
-      if (!response.ok) {
-        // If backend returned JSON error object, include it; else include text.
-        let msg = "";
-        if (json && json.error) msg = json.error;
-        else {
-          const txt = await response.text();
-          msg = txt || `HTTP ${response.status}`;
-        }
-        alert("Backend error: " + msg);
-        console.error("Backend error response:", response.status, json || await response.text());
-        payBtn.disabled = false;
-        return;
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Error: " + (data.error || "Unknown backend issue"));
       }
-
-      // Expecting backend to return { sessionId: <id> } or { url: <checkout url> }
-      // handle both possibilities
-      if (json.url) {
-        // older pattern: backend returned a direct url
-        window.location.href = json.url;
-        return;
-      }
-      if (!json || (!json.sessionId && !json.id && !json.session)) {
-        // unexpected response shape
-        alert("Backend returned unexpected response. Check console for details.");
-        console.error("Unexpected backend response:", json);
-        payBtn.disabled = false;
-        return;
-      }
-
-      // Normalize session id
-      const sessionId = json.sessionId || json.id || (json.session && json.session.id);
-      if (!sessionId) {
-        alert("Could not find session ID from backend.");
-        console.error("Missing session id in backend response:", json);
-        payBtn.disabled = false;
-        return;
-      }
-
-      // Redirect using Stripe
-      const ret = await stripe.redirectToCheckout({ sessionId });
-      if (ret && ret.error) {
-        alert(ret.error.message || "Stripe redirect error");
-        console.error("Stripe redirect error:", ret);
-      }
-
     } catch (err) {
-      console.error("Network or JS error:", err);
-      // Be helpful: if backend is down or CORS/preflight issues occur, show the error
-      alert("Network error contacting backend. Check console for details.");
-    } finally {
-      payBtn.disabled = false;
+      console.error(err);
+      alert("Network error contacting backend.");
     }
+    payBtn.disabled = false;
   });
   </script>
 </body>
