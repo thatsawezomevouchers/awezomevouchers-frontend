@@ -3,33 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <title>Awezome Vacation Vouchers</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      font-family: system-ui, Arial, sans-serif;
-      background: #f6f6f6;
-      padding: 24px;
-      display: flex;
-      justify-content: center;
-    }
-    .card {
-      width: 100%;
-      max-width: 640px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(20,20,20,0.08);
-    }
-    h1 { margin: 0 0 10px; text-align: center; }
-    label { display:block; margin-top: 12px; font-weight:600; }
-    input, select, button {
-      width: 100%; padding: 10px;
-      margin-top: 8px; border-radius: 6px;
-      border: 1px solid #ddd7de; font-size: 15px;
-    }
-    button { background:#0070f3; color:white; border:0; }
-    button:disabled { opacity: 0.6; }
-    #priceDisplay { margin-top: 14px; font-weight: 700; text-align: center; }
+    body{font-family:system-ui,Segoe UI,Arial;background:#f4f6f8;padding:24px;display:flex;justify-content:center}
+    .card{width:100%;max-width:640px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(20,20,20,.08)}
+    h1{margin:0 0 10px}
+    label{display:block;margin-top:12px;font-weight:600}
+    input,select,button{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #d0d7de;font-size:15px}
+    #priceDisplay{margin-top:14px;font-weight:700;text-align:center}
+    button{background:#0070f3;color:#fff;border:0;padding:12px}
+    button:disabled{opacity:.5}
+    p.note{margin-top:10px;font-size:13px;color:#666}
+    .row{display:flex;gap:10px}
+    .row > *{flex:1}
+    #search{margin-bottom:8px}
   </style>
 </head>
 <body>
@@ -40,14 +27,10 @@
     <input id="search" placeholder="Start typing country or city name..." />
 
     <label for="country">Country / Region</label>
-    <select id="country">
-      <option value="">Select Country / Region</option>
-    </select>
+    <select id="country"><option value="">Select Country / Region</option></select>
 
     <label for="city">City / Destination</label>
-    <select id="city">
-      <option value="">Select Destination</option>
-    </select>
+    <select id="city"><option value="">Select Destination</option></select>
 
     <label for="promo">Promo code (optional)</label>
     <input id="promo" placeholder="Enter promo code" />
@@ -55,161 +38,248 @@
     <div id="priceDisplay">Voucher Price: $0</div>
 
     <button id="payBtn">Pay with Card / Apple Pay</button>
-    <p style="margin-top:10px;font-size:13px;color:#666;">
-      If Apple Pay doesn't appear on your device, customers can also pay via your external channels.
-    </p>
+    <p class="note">If Apple Pay doesn't appear on your device, customers can also pay via your external channels.</p>
   </div>
 
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    const STRIPE_PUBLISHABLE_KEY = "pk_test_51SPy0XAfSy0uSdlW29eSoNbNbb3A6RRt4Td4Z3Srhg46eejyy78Wk3Sto6nYHH6EwHukcJPmh1q14fsTTj0C59E07dd2Db0B";
-    const backendURL = "https://awezomevouchers-backend.vercel.app";
-    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  // CONFIG: (paste your publishable key and backend)
+  const STRIPE_PUBLISHABLE_KEY = "pk_test_51SPYOdAfSKyDUssUW29eSSoNNNBb3A6RR4TdZ4Z3Srhg4Geejvy78Wk35to6nYHH6EwhUkxCjPMnlq14fsTI7QGS000j7dd2b8";
+  const backendURL = "https://awezomevouchers-backend.vercel.app"; // <-- your backend
 
-    // Default pricing
-    function computeClientPrice(country, city, promo) {
-      let base = 75;
-      if (country === "Special Vouchers" || country === "Cruise Destinations" || country === "Cruise Vacations") base = 100;
-      if (!promo) return base;
-      const p = promo.trim().toLowerCase();
-      if (p === "thats50%" && base === 75) return 50;
-      if (p === "thats75%" && base === 100) return 75;
-      if (p === "thatsfamily") return Math.round(base * 0.5);
-      return base;
-    }
+  const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
-    const countrySelect = document.getElementById("country");
-    const citySelect = document.getElementById("city");
-    const promoInput = document.getElementById("promo");
-    const priceDisplay = document.getElementById("priceDisplay");
-    const searchBox = document.getElementById("search");
-    const payBtn = document.getElementById("payBtn");
+  // ---- DESTINATIONS object ----
+  // Add / edit entries here if you need more destinations.
+  // The format: "Country": ["City (X Days, Y Nights)", ...]
+  const destinations = {
+    "Special Vouchers":[
+      "7-Night Villa Voucher (8 Days, 7 Nights)",
+      "3 Days, 2 Nights All-Inclusive Voucher (3 Days, 2 Nights)"
+    ],
+    "Cruise Destinations":["Cruise Vacation (3-14 Days Available)"],
+    "Argentina":["Buenos Aires (5 Days, 4 Nights)"],
+    "Australia":[
+      "Brisbane, QLD (4 Days, 3 Nights)",
+      "Cairns, QLD (4 Days, 3 Nights)",
+      "Darwin, NT (4 Days, 3 Nights)",
+      "Gold Coast, QLD (4 Days, 3 Nights)",
+      "Mackay, QLD (4 Days, 3 Nights)",
+      "Melbourne, VIC (4 Days, 3 Nights)",
+      "Perth, WA (4 Days, 3 Nights)",
+      "Rockhampton, QLD (4 Days, 3 Nights)",
+      "Sydney, NSW (4 Days, 3 Nights)",
+      "Townsville, QLD (4 Days, 3 Nights)"
+    ],
+    "Belgium":["Brussels (4 Days, 3 Nights)"],
+    "Brazil":["Rio de Janeiro (5 Days, 4 Nights)"],
+    "Canada":[
+      "Calgary (4 Days, 3 Nights)",
+      "Edmonton (4 Days, 3 Nights)",
+      "Halifax (4 Days, 3 Nights)",
+      "Montreal (4 Days, 3 Nights)",
+      "Niagara Falls (4 Days, 3 Nights)",
+      "Ottawa (4 Days, 3 Nights)",
+      "Quebec (4 Days, 3 Nights)",
+      "Revelstoke (4 Days, 3 Nights)",
+      "Toronto (4 Days, 3 Nights)",
+      "Vancouver (4 Days, 3 Nights)",
+      "Victoria (4 Days, 3 Nights)",
+      "Winnipeg (4 Days, 3 Nights)"
+    ],
+    "China":["Beijing (5 Days, 4 Nights)"],
+    "France":["Cannes (4 Days, 3 Nights)","Paris (5 Days, 4 Nights)"],
+    "Germany":["Berlin (4 Days, 3 Nights)","Munich (5 Days, 4 Nights)"],
+    "India":["Goa (5 Days, 4 Nights)"],
+    "Italy":["Amalfi Coast (5 Days, 4 Nights)","Florence (5 Days, 4 Nights)","Rome (5 Days, 4 Nights)"],
+    "Japan":["Kyoto (6 Days, 5 Nights)"],
+    "Mexico":["Cancun (6 Days, 5 Nights)","Cabo San Lucas (5 Days, 4 Nights)","Puerto Vallarta (6 Days, 5 Nights)"],
+    "New Zealand":["Auckland (5 Days, 4 Nights)","Bay Of Plenty & Rotorua (5 Days, 4 Nights)","Christchurch (5 Days, 4 Nights)"],
+    "Philippines":["Boracay (5 Days, 4 Nights)"],
+    "Singapore":["Singapore (5 Days, 4 Nights)"],
+    "South Africa":["Cape Town (5 Days, 4 Nights)"],
+    "Spain":["Barcelona (5 Days, 4 Nights)","Madrid (5 Days, 4 Nights)"],
+    "Thailand":["Bangkok (5 Days, 4 Nights)","Phuket (8 Days, 7 Nights)","Koh Samui (8 Days, 7 Nights)"],
+    "Turkey":["Antalya (4 Days, 3 Nights)","Istanbul (5 Days, 4 Nights)"],
+    "United Kingdom":["Edinburgh (4 Days, 3 Nights)","London (4 Days, 3 Nights)","Glasgow (4 Days, 3 Nights)"],
+    "United States":[
+      "Atlanta (4 Days, 3 Nights)","Boston (4 Days, 3 Nights)","Branson (4 Days, 3 Nights)","Cape Cod (4 Days, 3 Nights)",
+      "Chicago (4 Days, 3 Nights)","Daytona Beach (4 Days, 3 Nights)","Denver (4 Days, 3 Nights)","Fort Lauderdale (4 Days, 3 Nights)",
+      "Galveston (4 Days, 3 Nights)","Gatlinburg (4 Days, 3 Nights)","Grand Canyon (4 Days, 3 Nights)","Hawaii (6 Days, 5 Nights)",
+      "Las Vegas (4 Days, 3 Nights)","Los Angeles (4 Days, 3 Nights)","Miami (4 Days, 3 Nights)","Nashville (4 Days, 3 Nights)",
+      "New Orleans (4 Days, 3 Nights)","New York City (4 Days, 3 Nights)","North Carolina (8 Days, 7 Nights)","Ocean City (4 Days, 3 Nights)",
+      "Orlando (4 Days, 3 Nights)","Palm Springs (4 Days, 3 Nights)","Panama City (4 Days, 3 Nights)","Phoenix (4 Days, 3 Nights)",
+      "San Antonio (4 Days, 3 Nights)","San Diego (4 Days, 3 Nights)","San Francisco (4 Days, 3 Nights)","San Juan (5 Days, 4 Nights)",
+      "Savannah (4 Days, 3 Nights)","Sedona (4 Days, 3 Nights)","St. Petersburg (4 Days, 3 Nights)","Virginia Beach (4 Days, 3 Nights)",
+      "Washington DC (8 Days, 7 Nights)"
+    ]
+    // Add more countries & cities as needed
+  };
 
-    // Full destinations list
-    const destinations = {
-      "Special Vouchers": ["7-Night Villa Voucher (8 Days, 7 Nights)", "3 Days, 2 Nights All-Inclusive Voucher (3 Days, 2 Nights)"],
-      "Cruise Destinations": ["Cruise Vacation (3–14 Days Available)"],
-      "Argentina": ["Buenos Aires (5 Days, 4 Nights)"],
-      "Australia": ["Brisbane (4 Days, 3 Nights)", "Melbourne (4 Days, 3 Nights)", "Sydney (4 Days, 3 Nights)"],
-      "Austria": ["Vienna (5 Days, 4 Nights)"],
-      "Brazil": ["Rio de Janeiro (5 Days, 4 Nights)"],
-      "Canada": ["Toronto (4 Days, 3 Nights)", "Vancouver (4 Days, 3 Nights)"],
-      "China": ["Beijing (5 Days, 4 Nights)", "Macau (6 Days, 5 Nights)"],
-      "Colombia": ["Cartagena (5 Days, 4 Nights)", "Medellín (5 Days, 4 Nights)"],
-      "Dominican Republic": ["Punta Cana (5 Days, 4 Nights)", "Puerto Plata (6 Days, 5 Nights)"],
-      "France": ["Paris (5 Days, 4 Nights)", "Cannes (4 Days, 3 Nights)"],
-      "Germany": ["Berlin (4 Days, 3 Nights)", "Munich (5 Days, 4 Nights)"],
-      "Greece": ["Athens (5 Days, 4 Nights)", "Santorini (6 Days, 5 Nights)"],
-      "India": ["Goa (5 Days, 4 Nights)"],
-      "Indonesia": ["Bali (5 Days, 4 Nights)"],
-      "Italy": ["Rome (5 Days, 4 Nights)", "Venice (5 Days, 4 Nights)", "Amalfi Coast (5 Days, 4 Nights)"],
-      "Japan": ["Kyoto (6 Days, 5 Nights)"],
-      "Mexico": ["Cancun (6 Days, 5 Nights)", "Cabo San Lucas (5 Days, 4 Nights)"],
-      "Portugal": ["Lisbon (5 Days, 4 Nights)"],
-      "Spain": ["Barcelona (5 Days, 4 Nights)", "Madrid (5 Days, 4 Nights)"],
-      "Thailand": ["Bangkok (5 Days, 4 Nights)", "Phuket (8 Days, 7 Nights)"],
-      "Turkey": ["Istanbul (5 Days, 4 Nights)", "Bodrum (5 Days, 4 Nights)"],
-      "United Kingdom": ["London (4 Days, 3 Nights)", "Edinburgh (4 Days, 3 Nights)"],
-      "United States": [
-        "New York (4 Days, 3 Nights)",
-        "Miami (4 Days, 3 Nights)",
-        "Las Vegas (4 Days, 3 Nights)",
-        "Orlando (4 Days, 3 Nights)",
-        "Los Angeles (4 Days, 3 Nights)",
-        "Chicago (4 Days, 3 Nights)",
-        "Hawaii (6 Days, 5 Nights)"
-      ],
-      "Vanuatu": ["Vanuatu (5 Days, 4 Nights)"]
-    };
+  // ---- DOM references ----
+  const countrySelect = document.getElementById("country");
+  const citySelect = document.getElementById("city");
+  const promoInput = document.getElementById("promo");
+  const priceDisplay = document.getElementById("priceDisplay");
+  const searchBox = document.getElementById("search");
+  const payBtn = document.getElementById("payBtn");
 
-    // Populate countries
-    function populateCountryList(filterFn) {
-      const keys = Object.keys(destinations).sort((a, b) => a.localeCompare(b));
-      countrySelect.innerHTML = `<option value="">Select Country / Region</option>`;
-      keys.forEach(country => {
-        if (!filterFn || filterFn(country)) {
-          const o = document.createElement("option");
-          o.value = country;
-          o.textContent = country;
-          countrySelect.appendChild(o);
-        }
-      });
-    }
+  // compute client-side price rules (mirrors backend pricing)
+  function computeClientPrice(country, city, promo) {
+    let base = 75;
+    if (country === "Special Vouchers" || country === "Cruise Destinations" || country === "Cruise Vacations") base = 100;
+    if (!promo) return base;
+    const p = promo.trim().toLowerCase();
+    if (p === "thats50" && base === 75) return 50;
+    if (p === "thats75" && base === 100) return 75;
+    if (p === "thatsfamily") return Math.round(base * 0.5);
+    return base;
+  }
 
-    // Populate cities
-    function populateCityList(country) {
-      citySelect.innerHTML = `<option value="">Select Destination</option>`;
-      if (!country) return;
-      const cities = destinations[country] || [];
-      cities.sort((a, b) => a.localeCompare(b)).forEach(city => {
+  // populate country list alphabetically
+  function populateCountryList(filterFn) {
+    const keys = Object.keys(destinations).sort((a,b)=>a.localeCompare(b));
+    countrySelect.innerHTML = "<option value=''>Select Country / Region</option>";
+    keys.forEach(country=>{
+      if (!filterFn || filterFn(country)) {
         const o = document.createElement("option");
-        o.value = city;
-        o.textContent = city;
-        citySelect.appendChild(o);
-      });
-    }
-
-    populateCountryList();
-
-    function updateDisplayedPrice() {
-      const country = countrySelect.value;
-      const city = citySelect.value;
-      const promo = promoInput.value.trim();
-      const price = computeClientPrice(country, city, promo);
-      priceDisplay.textContent = `Voucher Price: $${price}`;
-    }
-
-    // Search box logic
-    searchBox.addEventListener("input", (e) => {
-      const q = e.target.value.trim().toLowerCase();
-      if (!q) return populateCountryList();
-      populateCountryList(country => {
-        if (country.toLowerCase().includes(q)) return true;
-        return (destinations[country] || []).some(city => city.toLowerCase().includes(q));
-      });
-    });
-
-    countrySelect.addEventListener("change", () => {
-      populateCityList(countrySelect.value);
-      updateDisplayedPrice();
-    });
-
-    citySelect.addEventListener("change", updateDisplayedPrice);
-    promoInput.addEventListener("input", updateDisplayedPrice);
-
-    payBtn.addEventListener("click", async () => {
-      payBtn.disabled = true;
-      const country = countrySelect.value;
-      const city = citySelect.value;
-      const promo = promoInput.value.trim();
-      if (!country) return alert("Please choose a country/region."), payBtn.disabled = false;
-      if (!city) return alert("Please choose a destination."), payBtn.disabled = false;
-
-      const price = computeClientPrice(country, city, promo);
-
-      try {
-        const response = await fetch(`${backendURL}/api/create-checkout-session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ price, country, city })
-        });
-
-        if (!response.ok) throw new Error(`Backend error: ${response.statusText}`);
-
-        const json = await response.json();
-        if (!json.sessionId) throw new Error("Missing session ID");
-
-        const { error } = await stripe.redirectToCheckout({ sessionId: json.sessionId });
-        if (error) alert(error.message);
-      } catch (err) {
-        console.error(err);
-        alert("Network error contacting backend. Check console.");
-      } finally {
-        payBtn.disabled = false;
+        o.value = country;
+        o.textContent = country;
+        countrySelect.appendChild(o);
       }
     });
+  }
 
+  // populate city list for a given country
+  function populateCityList(country) {
+    citySelect.innerHTML = "<option value=''>Select Destination</option>";
+    if (!country) return;
+    const cities = (destinations[country] || []).slice().sort((a,b)=>a.localeCompare(b));
+    cities.forEach(c=>{
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      citySelect.appendChild(o);
+    });
+  }
+
+  // update displayed price
+  function updateDisplayedPrice() {
+    const country = countrySelect.value;
+    const city = citySelect.value;
+    const promo = promoInput.value.trim();
+    const price = computeClientPrice(country, city, promo);
+    priceDisplay.textContent = `Voucher Price: $${price}`;
+  }
+
+  // search box - filters countries when typing country or city
+  searchBox.addEventListener("input", (e)=>{
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { populateCountryList(); return; }
+    populateCountryList(country=>{
+      if (country.toLowerCase().includes(q)) return true;
+      return (destinations[country] || []).some(city => city.toLowerCase().includes(q));
+    });
+  });
+
+  // events
+  countrySelect.addEventListener("change", ()=>{
+    populateCityList(countrySelect.value);
     updateDisplayedPrice();
+  });
+  citySelect.addEventListener("change", updateDisplayedPrice);
+  promoInput.addEventListener("input", updateDisplayedPrice);
+
+  // Initialize
+  populateCountryList();
+  updateDisplayedPrice();
+
+  // Single payment handler
+  payBtn.addEventListener("click", async () => {
+    payBtn.disabled = true;
+    try {
+      const country = countrySelect.value;
+      const city = citySelect.value;
+      const promo = promoInput.value.trim();
+      if (!country) { alert("Please choose a country/region."); payBtn.disabled = false; return; }
+      if (!city) { alert("Please choose a destination."); payBtn.disabled = false; return; }
+
+      const price = computeClientPrice(country, city, promo);
+
+      // POST to backend to create checkout session
+      const payload = {
+        price,
+        name: (document.getElementById("name")?.value) || "Customer",
+        email: (document.getElementById("email")?.value) || "none@none.com",
+        phone: (document.getElementById("phone")?.value) || "N/A",
+        country,
+        city,
+        promo
+      };
+
+      const response = await fetch(`${backendURL}/api/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      // Try to parse JSON, but if not JSON, show raw text for debugging.
+      let json;
+      try { json = await response.clone().json(); } catch(err) { json = null; }
+
+      if (!response.ok) {
+        // If backend returned JSON error object, include it; else include text.
+        let msg = "";
+        if (json && json.error) msg = json.error;
+        else {
+          const txt = await response.text();
+          msg = txt || `HTTP ${response.status}`;
+        }
+        alert("Backend error: " + msg);
+        console.error("Backend error response:", response.status, json || await response.text());
+        payBtn.disabled = false;
+        return;
+      }
+
+      // Expecting backend to return { sessionId: <id> } or { url: <checkout url> }
+      // handle both possibilities
+      if (json.url) {
+        // older pattern: backend returned a direct url
+        window.location.href = json.url;
+        return;
+      }
+      if (!json || (!json.sessionId && !json.id && !json.session)) {
+        // unexpected response shape
+        alert("Backend returned unexpected response. Check console for details.");
+        console.error("Unexpected backend response:", json);
+        payBtn.disabled = false;
+        return;
+      }
+
+      // Normalize session id
+      const sessionId = json.sessionId || json.id || (json.session && json.session.id);
+      if (!sessionId) {
+        alert("Could not find session ID from backend.");
+        console.error("Missing session id in backend response:", json);
+        payBtn.disabled = false;
+        return;
+      }
+
+      // Redirect using Stripe
+      const ret = await stripe.redirectToCheckout({ sessionId });
+      if (ret && ret.error) {
+        alert(ret.error.message || "Stripe redirect error");
+        console.error("Stripe redirect error:", ret);
+      }
+
+    } catch (err) {
+      console.error("Network or JS error:", err);
+      // Be helpful: if backend is down or CORS/preflight issues occur, show the error
+      alert("Network error contacting backend. Check console for details.");
+    } finally {
+      payBtn.disabled = false;
+    }
+  });
   </script>
 </body>
 </html>
