@@ -14,6 +14,7 @@
     button{background:#0070f3;color:#fff;border:0;padding:12px}
     button:disabled{opacity:.5}
     p.note{margin-top:10px;font-size:13px;color:#666}
+    .loading{opacity:0.6;cursor:not-allowed}
   </style>
 </head>
 <body>
@@ -36,10 +37,10 @@
     <input id="name" placeholder="Enter your name" />
 
     <label for="email">Email</label>
-    <input id="email" placeholder="Enter your email" />
+    <input id="email" type="email" placeholder="Enter your email" />
 
     <label for="phone">Phone Number</label>
-    <input id="phone" placeholder="Enter your phone number" />
+    <input id="phone" type="tel" placeholder="Enter your phone number" />
 
     <div id="priceDisplay">Voucher Price: $0</div>
 
@@ -56,20 +57,56 @@
   const STRIPE_PUBLISHABLE_KEY = "pk_test_51SPYOdAfSKyDUssUW29eSSoNNNBb3A6RR4TdZ4Z3Srhg4Geejvy78Wk35to6nYHH6EwhUkxCjPMnlq14fsTI7QGS000j7dd2b8";
   const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
-  // ---------- destinations (trimmed sample) ----------
-  // You can expand this list — this is a working subset so the UI and search behave well.
+  // ---------- destinations (expanded list) ----------
   const destinations = {
     "United States": [
       "New York (4 Days, 3 Nights)",
       "Los Angeles (4 Days, 3 Nights)",
       "Miami (4 Days, 3 Nights)",
       "Las Vegas (4 Days, 3 Nights)",
-      "San Francisco (4 Days, 3 Nights)"
+      "San Francisco (4 Days, 3 Nights)",
+      "Chicago (4 Days, 3 Nights)",
+      "Orlando (4 Days, 3 Nights)"
     ],
-    "Australia": ["Sydney (4 Days, 3 Nights)", "Melbourne (4 Days, 3 Nights)"],
-    "Brazil": ["Rio de Janeiro (5 Days, 4 Nights)"],
-    "France": ["Paris (5 Days, 4 Nights)"],
-    "Japan": ["Tokyo (6 Days, 5 Nights)"]
+    "Australia": [
+      "Sydney (4 Days, 3 Nights)", 
+      "Melbourne (4 Days, 3 Nights)",
+      "Brisbane (4 Days, 3 Nights)"
+    ],
+    "Brazil": [
+      "Rio de Janeiro (5 Days, 4 Nights)",
+      "São Paulo (4 Days, 3 Nights)"
+    ],
+    "France": [
+      "Paris (5 Days, 4 Nights)",
+      "Nice (4 Days, 3 Nights)"
+    ],
+    "Japan": [
+      "Tokyo (6 Days, 5 Nights)",
+      "Osaka (5 Days, 4 Nights)",
+      "Kyoto (5 Days, 4 Nights)"
+    ],
+    "Italy": [
+      "Rome (5 Days, 4 Nights)",
+      "Venice (4 Days, 3 Nights)",
+      "Florence (4 Days, 3 Nights)"
+    ],
+    "Spain": [
+      "Barcelona (4 Days, 3 Nights)",
+      "Madrid (4 Days, 3 Nights)"
+    ],
+    "Thailand": [
+      "Bangkok (5 Days, 4 Nights)",
+      "Phuket (5 Days, 4 Nights)"
+    ],
+    "Mexico": [
+      "Cancun (5 Days, 4 Nights)",
+      "Mexico City (4 Days, 3 Nights)"
+    ],
+    "Greece": [
+      "Athens (4 Days, 3 Nights)",
+      "Santorini (4 Days, 3 Nights)"
+    ]
   };
 
   // Elements
@@ -86,7 +123,8 @@
     Object.keys(destinations).sort((a,b)=>a.localeCompare(b)).forEach(country=>{
       if (!filterFn || filterFn(country)) {
         const o = document.createElement("option");
-        o.value = country; o.textContent = country;
+        o.value = country; 
+        o.textContent = country;
         countrySelect.appendChild(o);
       }
     });
@@ -98,7 +136,8 @@
     if (!country) return;
     (destinations[country] || []).slice().sort((a,b)=>a.localeCompare(b)).forEach(c=>{
       const o = document.createElement("option");
-      o.value = c; o.textContent = c;
+      o.value = c; 
+      o.textContent = c;
       citySelect.appendChild(o);
     });
   }
@@ -107,11 +146,11 @@
   function computePrice(country) {
     if (!country) return 0;
     let base = 75;
-    if (country === "Special Vouchers") base = 100;
     // promo codes could reduce here
     const p = (promoInput.value || "").trim().toLowerCase();
     if (p === "thats50") return 50;
     if (p === "thats75") return 75;
+    if (p === "save20") return 60;
     return base;
   }
 
@@ -125,6 +164,7 @@
     const q = (e.target.value || "").trim().toLowerCase();
     if (!q) {
       populateCountries();
+      citySelect.innerHTML = "<option value=''>Select Destination</option>";
       return;
     }
     populateCountries(country=>{
@@ -158,7 +198,17 @@
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
     payBtn.disabled = true;
+    payBtn.textContent = "Processing...";
+    payBtn.classList.add('loading');
+
     try {
       const resp = await fetch(`${backendURL}/api/create-checkout-session`, {
         method: "POST",
@@ -167,10 +217,11 @@
       });
 
       const data = await resp.json();
+      
       if (!resp.ok) {
         console.error("Backend returned error:", data);
-        alert("Backend error: " + (data.error || "unknown"));
-        payBtn.disabled = false;
+        alert("Error: " + (data.error || "Unable to process payment"));
+        resetPayButton();
         return;
       }
 
@@ -178,15 +229,21 @@
         // redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
-        alert("Unexpected backend response.");
-        payBtn.disabled = false;
+        alert("Unexpected response from server.");
+        resetPayButton();
       }
     } catch (err) {
       console.error("Network error contacting backend:", err);
-      alert("Network error contacting backend. Check console and backend logs.");
-      payBtn.disabled = false;
+      alert("Network error. Please check your connection and try again.");
+      resetPayButton();
     }
   });
+
+  function resetPayButton() {
+    payBtn.disabled = false;
+    payBtn.textContent = "Pay with Card / Apple Pay";
+    payBtn.classList.remove('loading');
+  }
   </script>
 </body>
 </html>
