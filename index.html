@@ -244,31 +244,43 @@
   promoInput.addEventListener("input", updateDisplayedPrice);
   payBtn.addEventListener("click", async ()=>{
     payBtn.disabled = true;
-    const country = countrySelect.value;
-    const city = citySelect.value;
-    const promo = promoInput.value.trim();
-
+    const backendURL = "https://awezomevouchers-backend.vercel.app";
+payBtn.addEventListener("click", async () => {
+  payBtn.disabled = true;
+  const country = countrySelect.value;
+  const city = citySelect.value;
+  const promo = promoInput.value.trim();
     if(!country) { alert("Please choose a country/region."); payBtn.disabled = false; return; }
     if(!city) { alert("Please choose a destination."); payBtn.disabled = false; return; }
 
     try {
-      const response = await fetch(`${backendURL}/api/create-checkout-session`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    price,
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-  }),
-});
-      const json = await res.json();
-      if (json.error) {
-        alert("Payment setup error: " + json.error);
-        console.error("backend error", json);
-        payBtn.disabled = false;
-        return;
-      }
+  const response = await fetch(`${backendURL}/api/create-checkout-session`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      price,
+      name: document.getElementById("name")?.value || "Customer",
+      email: document.getElementById("email")?.value || "none@none.com",
+      phone: document.getElementById("phone")?.value || "N/A"
+    }),
+  });
+
+  const json = await response.json();
+  if (!response.ok) {
+    alert("Backend error: " + (json.error || "unknown"));
+    payBtn.disabled = false;
+    return;
+  }
+
+  const { sessionId } = json;
+  const ret = await stripe.redirectToCheckout({ sessionId });
+  if (ret.error) alert(ret.error.message);
+  payBtn.disabled = false;
+} catch (err) {
+  console.error(err);
+  alert("Network error contacting backend.");
+  payBtn.disabled = false;
+}
       // redirect to Stripe Checkout
       const { sessionId } = json;
       const ret = await stripe.redirectToCheckout({ sessionId });
