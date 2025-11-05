@@ -15,14 +15,16 @@
     button:disabled{opacity:.5}
     p.note{margin-top:10px;font-size:13px;color:#666}
     .loading{opacity:0.6;cursor:not-allowed}
+    .search-info{font-size:12px;color:#666;margin-top:4px;font-style:italic;}
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Awezome Vacation Vouchers</h1>
 
-    <label for="search">Search (country or city)</label>
-    <input id="search" placeholder="Start typing country or city name..." />
+    <label for="search">Search Destinations</label>
+    <input id="search" placeholder="Type country name, city name, or destination..." />
+    <p class="search-info">Search by country (e.g., "Spain"), city (e.g., "Paris"), or destination name</p>
 
     <label for="country">Country / Region</label>
     <select id="country"><option value="">Select Country / Region</option></select>
@@ -57,56 +59,190 @@
   const STRIPE_PUBLISHABLE_KEY = "pk_test_51SPYOdAfSKyDUssUW29eSSoNNNBb3A6RR4TdZ4Z3Srhg4Geejvy78Wk35to6nYHH6EwhUkxCjPMnlq14fsTI7QGS000j7dd2b8";
   const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
-  // ---------- destinations (expanded list) ----------
+  // ---------- ALL DESTINATIONS (139 Total) ----------
   const destinations = {
+    // Special categories at the top
+    "Special Vouchers": [
+      "7-Night Villa Voucher - 8 Days, 7 Nights",
+      "3 Days, 2 Nights All-Inclusive Voucher - 3 Days, 2 Nights"
+    ],
+    "Cruise Destinations": [
+      "Cruise Vacation - 3-14 Days Available"
+    ],
+    
+    // United States comes next
     "United States": [
-      "New York (4 Days, 3 Nights)",
-      "Los Angeles (4 Days, 3 Nights)",
-      "Miami (4 Days, 3 Nights)",
-      "Las Vegas (4 Days, 3 Nights)",
-      "San Francisco (4 Days, 3 Nights)",
-      "Chicago (4 Days, 3 Nights)",
-      "Orlando (4 Days, 3 Nights)"
+      "Las Vegas - 4 Days, 3 Nights",
+      "Orlando - 4 Days, 3 Nights",
+      "Miami - 4 Days, 3 Nights",
+      "New York City - 4 Days, 3 Nights",
+      "Los Angeles - 4 Days, 3 Nights",
+      "San Francisco - 4 Days, 3 Nights",
+      "Chicago - 4 Days, 3 Nights",
+      "Boston - 4 Days, 3 Nights",
+      "Washington DC - 8 Days, 7 Nights",
+      "Atlanta - 4 Days, 3 Nights",
+      "Phoenix - 4 Days, 3 Nights",
+      "San Diego - 4 Days, 3 Nights",
+      "Nashville - 4 Days, 3 Nights",
+      "New Orleans - 4 Days, 3 Nights",
+      "San Antonio - 4 Days, 3 Nights",
+      "Fort Lauderdale - 4 Days, 3 Nights",
+      "Virginia Beach - 4 Days, 3 Nights",
+      "Myrtle Beach - 4 Days, 3 Nights",
+      "Ocean City - 4 Days, 3 Nights",
+      "Atlantic City - 4 Days, 3 Nights",
+      "Galveston - 4 Days, 3 Nights",
+      "Daytona Beach - 4 Days, 3 Nights",
+      "Panama City - 4 Days, 3 Nights",
+      "Gulf Shores - 4 Days, 3 Nights",
+      "Cape Cod - 4 Days, 3 Nights",
+      "Gatlinburg - 4 Days, 3 Nights",
+      "Branson - 4 Days, 3 Nights",
+      "Hot Springs - 4 Days, 3 Nights",
+      "Sedona - 4 Days, 3 Nights",
+      "Grand Canyon - 4 Days, 3 Nights",
+      "Lake Tahoe - 4 Days, 3 Nights",
+      "Napa Valley - 4 Days, 3 Nights",
+      "Palm Springs - 4 Days, 3 Nights",
+      "Estes Park - 4 Days, 3 Nights",
+      "Denver, Colorado - 4 Days, 3 Nights",
+      "Colorado Springs, Colorado - 4 Days, 3 Nights",
+      "North Carolina - 8 Days, 7 Nights",
+      "Savannah - 4 Days, 3 Nights",
+      "Charlestown SC - 4 Days, 3 Nights",
+      "St. Petersburg - 4 Days, 3 Nights",
+      "San Juan - 5 Days, 4 Nights",
+      "Hawaii - 6 Days, 5 Nights"
     ],
+
+    // All other countries in alphabetical order
+    "Argentina": ["Buenos Aires - 5 Days, 4 Nights"],
     "Australia": [
-      "Sydney (4 Days, 3 Nights)", 
-      "Melbourne (4 Days, 3 Nights)",
-      "Brisbane (4 Days, 3 Nights)"
+      "Sydney, NSW - 4 Days, 3 Nights",
+      "Mackay, QLD - 4 Days, 3 Nights",
+      "Townsville, QLD - 4 Days, 3 Nights",
+      "Brisbane, QLD - 4 Days, 3 Nights",
+      "Cairns, QLD - 4 Days, 3 Nights",
+      "Darwin, NT - 4 Days, 3 Nights",
+      "Gold Coast, QLD - 4 Days, 3 Nights",
+      "Melbourne, VIC - 4 Days, 3 Nights",
+      "Perth, WA - 4 Days, 3 Nights",
+      "Rockhampton, QLD - 4 Days, 3 Nights"
     ],
-    "Brazil": [
-      "Rio de Janeiro (5 Days, 4 Nights)",
-      "São Paulo (4 Days, 3 Nights)"
+    "Austria": ["Vienna - 5 Days, 4 Nights"],
+    "Belgium": ["Brussels - 4 Days, 3 Nights"],
+    "Brazil": ["Rio de Janeiro - 5 Days, 4 Nights"],
+    "Canada": [
+      "Calgary - 4 Days, 3 Nights",
+      "Edmonton - 4 Days, 3 Nights",
+      "Halifax - 4 Days, 3 Nights",
+      "Montreal - 4 Days, 3 Nights",
+      "Niagara Falls - 4 Days, 3 Nights",
+      "Ottawa - 4 Days, 3 Nights",
+      "Quebec - 4 Days, 3 Nights",
+      "Revelstoke - 4 Days, 3 Nights",
+      "Toronto - 4 Days, 3 Nights",
+      "Vancouver - 4 Days, 3 Nights",
+      "Victoria - 4 Days, 3 Nights",
+      "Winnipeg - 4 Days, 3 Nights"
     ],
+    "China": [
+      "Beijing - 5 Days, 4 Nights",
+      "Macau - 6 Days, 5 Nights"
+    ],
+    "Colombia": [
+      "Cartagena - 5 Days, 4 Nights",
+      "Medellín - 5 Days, 4 Nights"
+    ],
+    "Croatia": ["Dubrovnik - 5 Days, 4 Nights"],
+    "Denmark": ["Copenhagen - 5 Days, 4 Nights"],
+    "Dominican Republic": [
+      "Puerto Plata - 6 Days, 5 Nights",
+      "Punta Cana - 5 Days, 4 Nights"
+    ],
+    "Fiji": ["Fiji - 5 Days, 4 Nights"],
     "France": [
-      "Paris (5 Days, 4 Nights)",
-      "Nice (4 Days, 3 Nights)"
+      "Paris - 5 Days, 4 Nights",
+      "Cannes - 4 Days, 3 Nights"
     ],
-    "Japan": [
-      "Tokyo (6 Days, 5 Nights)",
-      "Osaka (5 Days, 4 Nights)",
-      "Kyoto (5 Days, 4 Nights)"
-    ],
-    "Italy": [
-      "Rome (5 Days, 4 Nights)",
-      "Venice (4 Days, 3 Nights)",
-      "Florence (4 Days, 3 Nights)"
-    ],
-    "Spain": [
-      "Barcelona (4 Days, 3 Nights)",
-      "Madrid (4 Days, 3 Nights)"
-    ],
-    "Thailand": [
-      "Bangkok (5 Days, 4 Nights)",
-      "Phuket (5 Days, 4 Nights)"
-    ],
-    "Mexico": [
-      "Cancun (5 Days, 4 Nights)",
-      "Mexico City (4 Days, 3 Nights)"
+    "Germany": [
+      "Berlin - 4 Days, 3 Nights",
+      "Munich - 5 Days, 4 Nights"
     ],
     "Greece": [
-      "Athens (4 Days, 3 Nights)",
-      "Santorini (4 Days, 3 Nights)"
-    ]
+      "Athens, Greece - 5 Days, 4 Nights",
+      "Crete, Greece - 6 Days, 5 Nights",
+      "Santorini, Greece - 6 Days, 5 Nights"
+    ],
+    "Hungary": ["Budapest - 5 Days, 4 Nights"],
+    "Iceland": ["Reykjavik - 5 Days, 4 Nights"],
+    "India": ["Goa - 5 Days, 4 Nights"],
+    "Indonesia": ["Bali, Indonesia - 5 Days, 4 Nights"],
+    "Ireland": ["Dublin - 4 Days, 3 Nights"],
+    "Israel": ["Jerusalem - 5 Days, 4 Nights"],
+    "Italy": [
+      "Rome - 5 Days, 4 Nights",
+      "Venice - 5 Days, 4 Nights",
+      "Milan - 5 Days, 4 Nights",
+      "Naples - 5 Days, 4 Nights",
+      "Florence - 5 Days, 4 Nights",
+      "Amalfi Coast - 5 Days, 4 Nights"
+    ],
+    "Japan": ["Kyoto - 6 Days, 5 Nights"],
+    "Malaysia": ["Kuala Lumpur - 6 Days, 5 Nights"],
+    "Maldives": ["Maldives - 6 Days, 5 Nights"],
+    "Mexico": [
+      "Cabo San Lucas - 5 Days, 4 Nights",
+      "Puerto Vallarta - 6 Days, 5 Nights",
+      "Cancun - 6 Days, 5 Nights"
+    ],
+    "Netherlands": ["Amsterdam, Netherlands - 4 Days, 3 Nights"],
+    "New Zealand": [
+      "Auckland - 5 Days, 4 Nights",
+      "Bay Of Plenty and Rotorua - 5 Days, 4 Nights",
+      "Christchurch - 5 Days, 4 Nights",
+      "Dunedin - 5 Days, 4 Nights",
+      "Marlborough - 5 Days, 4 Nights",
+      "Wellington - 5 Days, 4 Nights"
+    ],
+    "Philippines": [
+      "Bohol - 6 Days, 5 Nights",
+      "Boracay - 5 Days, 4 Nights"
+    ],
+    "Portugal": ["Lisbon - 5 Days, 4 Nights"],
+    "Puerto Rico": ["San Juan - 5 Days, 4 Nights"],
+    "Saudi Arabia": ["Mecca - 4 Days, 3 Nights"],
+    "Singapore": ["Singapore - 5 Days, 4 Nights"],
+    "South Africa": ["Cape Town - 5 Days, 4 Nights"],
+    "South Korea": ["Seoul - 6 Days, 5 Nights"],
+    "Spain": [
+      "Barcelona - 5 Days, 4 Nights",
+      "Benidorm - 5 Days, 4 Nights",
+      "Madrid - 5 Days, 4 Nights",
+      "Majorca - 5 Days, 4 Nights",
+      "Tenerife - 5 Days, 4 Nights"
+    ],
+    "Sweden": ["Stockholm - 5 Days, 4 Nights"],
+    "Tanzania": ["Zanzibar - 5 Days, 4 Nights"],
+    "Thailand": [
+      "Bangkok - 5 Days, 4 Nights",
+      "Koh Samui - 8 Days, 7 Nights",
+      "Pattaya - 6 Days, 5 Nights",
+      "Phuket - 8 Days, 7 Nights"
+    ],
+    "Turkey": [
+      "Antalya - 4 Days, 3 Nights",
+      "Bodrum - 5 Days, 4 Nights",
+      "Istanbul - 5 Days, 4 Nights"
+    ],
+    "UAE": ["Dubai, UAE - 5 Days, 4 Nights"],
+    "United Kingdom": [
+      "Edinburgh - 4 Days, 3 Nights",
+      "Glasgow - 4 Days, 3 Nights",
+      "London - 4 Days, 3 Nights"
+    ],
+    "Vanuatu": ["Vanuatu - 5 Days, 4 Nights"]
   };
 
   // Elements
@@ -117,10 +253,22 @@
   const priceDisplay = document.getElementById("priceDisplay");
   const payBtn = document.getElementById("payBtn");
 
-  // populate countries
+  // Custom sorting function to maintain the specific order
+  function getSortedCountries() {
+    const specialOrder = ["Special Vouchers", "Cruise Destinations", "United States"];
+    const otherCountries = Object.keys(destinations)
+      .filter(country => !specialOrder.includes(country))
+      .sort((a, b) => a.localeCompare(b));
+    
+    return [...specialOrder, ...otherCountries];
+  }
+
+  // populate countries with custom order
   function populateCountries(filterFn) {
     countrySelect.innerHTML = "<option value=''>Select Country / Region</option>";
-    Object.keys(destinations).sort((a,b)=>a.localeCompare(b)).forEach(country=>{
+    const sortedCountries = getSortedCountries();
+    
+    sortedCountries.forEach(country => {
       if (!filterFn || filterFn(country)) {
         const o = document.createElement("option");
         o.value = country; 
@@ -142,16 +290,37 @@
     });
   }
 
-  // price logic (simple)
+  // CORRECTED PRICE LOGIC
   function computePrice(country) {
     if (!country) return 0;
-    let base = 75;
-    // promo codes could reduce here
-    const p = (promoInput.value || "").trim().toLowerCase();
-    if (p === "thats50") return 50;
-    if (p === "thats75") return 75;
-    if (p === "save20") return 60;
-    return base;
+    
+    // Base prices
+    let basePrice;
+    if (country === "Special Vouchers" || country === "Cruise Destinations") {
+      basePrice = 100; // Special vouchers and cruise vouchers are $100
+    } else {
+      basePrice = 75; // All regular vouchers are $75
+    }
+
+    // Apply promo codes
+    const promo = (promoInput.value || "").trim().toLowerCase();
+    
+    // thatsfamily - 50% off any voucher
+    if (promo === "thatsfamily") {
+      return Math.round(basePrice * 0.5);
+    }
+    
+    // Special voucher/cruise promo code
+    if ((country === "Special Vouchers" || country === "Cruise Destinations") && promo === "thats75") {
+      return 75;
+    }
+    
+    // Regular voucher promo code
+    if (country !== "Special Vouchers" && country !== "Cruise Destinations" && promo === "thats50") {
+      return 50;
+    }
+    
+    return basePrice;
   }
 
   function updateDisplayedPrice() {
@@ -159,18 +328,38 @@
     priceDisplay.textContent = `Voucher Price: $${price}`;
   }
 
-  // search logic: matches country OR city names
+  // SMART SEARCH FUNCTION - searches both countries and cities
   searchBox.addEventListener("input", (e)=>{
-    const q = (e.target.value || "").trim().toLowerCase();
-    if (!q) {
+    const query = (e.target.value || "").trim().toLowerCase();
+    
+    if (!query) {
       populateCountries();
       citySelect.innerHTML = "<option value=''>Select Destination</option>";
       return;
     }
-    populateCountries(country=>{
-      if (country.toLowerCase().includes(q)) return true;
-      return destinations[country].some(city=>city.toLowerCase().includes(q));
+
+    populateCountries(country => {
+      // Search country names
+      if (country.toLowerCase().includes(query)) return true;
+      
+      // Search city/destination names within this country
+      if (destinations[country]) {
+        return destinations[country].some(city => 
+          city.toLowerCase().includes(query)
+        );
+      }
+      
+      return false;
     });
+
+    // If only one country matches and it has cities, auto-populate cities for better UX
+    const visibleOptions = Array.from(countrySelect.options).filter(opt => opt.value && !opt.disabled);
+    if (visibleOptions.length === 1) {
+      const autoCountry = visibleOptions[0].value;
+      countrySelect.value = autoCountry;
+      populateCities(autoCountry);
+      updateDisplayedPrice();
+    }
   });
 
   countrySelect.addEventListener("change", ()=>{
