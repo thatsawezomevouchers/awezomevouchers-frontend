@@ -1,185 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Awezome Vacation Vouchers</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-family: system-ui, sans-serif;
       background: #f4f6f8;
-      padding: 24px;
+      padding: 20px;
       display: flex;
       justify-content: center;
-      min-height: 100vh;
     }
-    
     .card {
       width: 100%;
-      max-width: 760px;
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
+      max-width: 600px;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
     h1 {
-      margin: 0 0 20px;
-      color: #1a1a1a;
       text-align: center;
-      font-size: 28px;
+      margin-bottom: 20px;
     }
-    
     label {
       display: block;
-      margin-top: 20px;
+      margin-top: 15px;
       font-weight: 600;
-      color: #333;
-      font-size: 16px;
     }
-    
     input, select, button {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      border-radius: 8px;
-      border: 1px solid #d0d7de;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
       font-size: 16px;
-      font-family: inherit;
     }
-    
-    input:focus, select:focus {
-      outline: none;
-      border-color: #0070f3;
-      box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
-    }
-    
-    #priceDisplay {
-      margin-top: 20px;
-      font-weight: 700;
-      text-align: center;
-      font-size: 20px;
-      color: #1a1a1a;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
-    
     button {
       background: #0070f3;
-      color: #fff;
-      border: 0;
-      padding: 15px;
-      font-size: 18px;
-      font-weight: 600;
+      color: white;
+      border: none;
+      padding: 12px;
+      margin-top: 20px;
       cursor: pointer;
-      transition: background-color 0.2s;
-      margin-top: 25px;
     }
-    
-    button:hover:not(:disabled) {
-      background: #005cc5;
-    }
-    
     button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    
-    p.note {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #666;
-      text-align: center;
-      line-height: 1.4;
-    }
-    
-    .loading {
       opacity: 0.6;
-      cursor: not-allowed;
     }
-    
-    .search-info {
-      font-size: 13px;
-      color: #666;
-      margin-top: 6px;
-      font-style: italic;
-      line-height: 1.3;
-    }
-    
-    .form-group {
-      margin-bottom: 5px;
+    #priceDisplay {
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      margin: 15px 0;
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Awezome Vacation Vouchers</h1>
-
-    <div class="form-group">
-      <label for="search">Search Destinations</label>
-      <input type="text" id="search" placeholder="Type country name, city name, or destination..." />
-      <p class="search-info">Search by country (e.g., "Spain"), city (e.g., "Paris"), or destination name</p>
-    </div>
-
-    <div class="form-group">
-      <label for="country">Country / Region</label>
-      <select id="country">
-        <option value="">Select Country / Region</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="city">City / Destination</label>
-      <select id="city">
-        <option value="">Select Destination</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="promo">Promo code (optional)</label>
-      <input type="text" id="promo" placeholder="Enter promo code" />
-    </div>
-
-    <div class="form-group">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" placeholder="Enter your name" />
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter your email" />
-    </div>
-
-    <div class="form-group">
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" placeholder="Enter your phone number" />
-    </div>
-
+    
+    <label for="search">Search Destinations</label>
+    <input type="text" id="search" placeholder="Type country or city name...">
+    
+    <label for="country">Country / Region</label>
+    <select id="country">
+      <option value="">Select Country</option>
+    </select>
+    
+    <label for="city">City / Destination</label>
+    <select id="city">
+      <option value="">Select Destination</option>
+    </select>
+    
+    <label for="promo">Promo code (optional)</label>
+    <input type="text" id="promo" placeholder="Enter promo code">
+    
+    <label for="name">Full Name</label>
+    <input type="text" id="name" placeholder="Enter your name">
+    
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="Enter your email">
+    
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" placeholder="Enter your phone number">
+    
     <div id="priceDisplay">Voucher Price: $0</div>
-
+    
     <button id="payBtn">Pay with Card / Apple Pay</button>
-    <p class="note">If Apple Pay doesn't appear, you can still pay via card checkout.</p>
+    <p style="text-align: center; color: #666; font-size: 14px; margin-top: 10px;">
+      If Apple Pay doesn't appear, you can still pay via card checkout.
+    </p>
   </div>
 
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-  // Backend URL - UPDATE THIS if needed
-  const backendURL = "https://awezomevouchers-backend.vercel.app";
-
-  // YOUR STRIPE PUBLISHABLE KEY
-  const STRIPE_PUBLISHABLE_KEY = "pk_live_51SPYOXA2x8asxal3vfIdkyNdFM9mFs3aaGXbNNgV7ue1G5LjDhywmFkW4qAraNMNhJgRBKjNSS3QBzx5lX6WcTtD00WLa7KIxy";
-  const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-
-  // ---------- ALL DESTINATIONS (139 Total) ----------
+  // Simple destinations list
   const destinations = {
-    // Special categories at the top
     "Special Vouchers": [
       "7-Night Villa Voucher - 8 Days, 7 Nights",
       "3 Days, 2 Nights All-Inclusive Voucher - 3 Days, 2 Nights"
@@ -187,385 +104,135 @@
     "Cruise Destinations": [
       "Cruise Vacation - 3-14 Days Available"
     ],
-    
-    // United States comes next
     "United States": [
       "Las Vegas - 4 Days, 3 Nights",
       "Orlando - 4 Days, 3 Nights",
-      "Miami - 4 Days, 3 Nights",
-      "New York City - 4 Days, 3 Nights",
-      "Los Angeles - 4 Days, 3 Nights",
-      "San Francisco - 4 Days, 3 Nights",
-      "Chicago - 4 Days, 3 Nights",
-      "Boston - 4 Days, 3 Nights",
-      "Washington DC - 8 Days, 7 Nights",
-      "Atlanta - 4 Days, 3 Nights",
-      "Phoenix - 4 Days, 3 Nights",
-      "San Diego - 4 Days, 3 Nights",
-      "Nashville - 4 Days, 3 Nights",
-      "New Orleans - 4 Days, 3 Nights",
-      "San Antonio - 4 Days, 3 Nights",
-      "Fort Lauderdale - 4 Days, 3 Nights",
-      "Virginia Beach - 4 Days, 3 Nights",
-      "Myrtle Beach - 4 Days, 3 Nights",
-      "Ocean City - 4 Days, 3 Nights",
-      "Atlantic City - 4 Days, 3 Nights",
-      "Galveston - 4 Days, 3 Nights",
-      "Daytona Beach - 4 Days, 3 Nights",
-      "Panama City - 4 Days, 3 Nights",
-      "Gulf Shores - 4 Days, 3 Nights",
-      "Cape Cod - 4 Days, 3 Nights",
-      "Gatlinburg - 4 Days, 3 Nights",
-      "Branson - 4 Days, 3 Nights",
-      "Hot Springs - 4 Days, 3 Nights",
-      "Sedona - 4 Days, 3 Nights",
-      "Grand Canyon - 4 Days, 3 Nights",
-      "Lake Tahoe - 4 Days, 3 Nights",
-      "Napa Valley - 4 Days, 3 Nights",
-      "Palm Springs - 4 Days, 3 Nights",
-      "Estes Park - 4 Days, 3 Nights",
-      "Denver, Colorado - 4 Days, 3 Nights",
-      "Colorado Springs, Colorado - 4 Days, 3 Nights",
-      "North Carolina - 8 Days, 7 Nights",
-      "Savannah - 4 Days, 3 Nights",
-      "Charlestown SC - 4 Days, 3 Nights",
-      "St. Petersburg - 4 Days, 3 Nights",
-      "San Juan - 5 Days, 4 Nights",
-      "Hawaii - 6 Days, 5 Nights"
+      "Miami - 4 Days, 3 Nights"
     ],
-
-    // All other countries in alphabetical order
-    "Argentina": ["Buenos Aires - 5 Days, 4 Nights"],
     "Australia": [
       "Sydney, NSW - 4 Days, 3 Nights",
-      "Mackay, QLD - 4 Days, 3 Nights",
-      "Townsville, QLD - 4 Days, 3 Nights",
-      "Brisbane, QLD - 4 Days, 3 Nights",
-      "Cairns, QLD - 4 Days, 3 Nights",
-      "Darwin, NT - 4 Days, 3 Nights",
-      "Gold Coast, QLD - 4 Days, 3 Nights",
       "Melbourne, VIC - 4 Days, 3 Nights",
-      "Perth, WA - 4 Days, 3 Nights",
-      "Rockhampton, QLD - 4 Days, 3 Nights"
-    ],
-    "Austria": ["Vienna - 5 Days, 4 Nights"],
-    "Belgium": ["Brussels - 4 Days, 3 Nights"],
-    "Brazil": ["Rio de Janeiro - 5 Days, 4 Nights"],
-    "Canada": [
-      "Calgary - 4 Days, 3 Nights",
-      "Edmonton - 4 Days, 3 Nights",
-      "Halifax - 4 Days, 3 Nights",
-      "Montreal - 4 Days, 3 Nights",
-      "Niagara Falls - 4 Days, 3 Nights",
-      "Ottawa - 4 Days, 3 Nights",
-      "Quebec - 4 Days, 3 Nights",
-      "Revelstoke - 4 Days, 3 Nights",
-      "Toronto - 4 Days, 3 Nights",
-      "Vancouver - 4 Days, 3 Nights",
-      "Victoria - 4 Days, 3 Nights",
-      "Winnipeg - 4 Days, 3 Nights"
-    ],
-    "China": [
-      "Beijing - 5 Days, 4 Nights",
-      "Macau - 6 Days, 5 Nights"
-    ],
-    "Colombia": [
-      "Cartagena - 5 Days, 4 Nights",
-      "Medellín - 5 Days, 4 Nights"
-    ],
-    "Croatia": ["Dubrovnik - 5 Days, 4 Nights"],
-    "Denmark": ["Copenhagen - 5 Days, 4 Nights"],
-    "Dominican Republic": [
-      "Puerto Plata - 6 Days, 5 Nights",
-      "Punta Cana - 5 Days, 4 Nights"
-    ],
-    "Fiji": ["Fiji - 5 Days, 4 Nights"],
-    "France": [
-      "Paris - 5 Days, 4 Nights",
-      "Cannes - 4 Days, 3 Nights"
-    ],
-    "Germany": [
-      "Berlin - 4 Days, 3 Nights",
-      "Munich - 5 Days, 4 Nights"
-    ],
-    "Greece": [
-      "Athens, Greece - 5 Days, 4 Nights",
-      "Crete, Greece - 6 Days, 5 Nights",
-      "Santorini, Greece - 6 Days, 5 Nights"
-    ],
-    "Hungary": ["Budapest - 5 Days, 4 Nights"],
-    "Iceland": ["Reykjavik - 5 Days, 4 Nights"],
-    "India": ["Goa - 5 Days, 4 Nights"],
-    "Indonesia": ["Bali, Indonesia - 5 Days, 4 Nights"],
-    "Ireland": ["Dublin - 4 Days, 3 Nights"],
-    "Israel": ["Jerusalem - 5 Days, 4 Nights"],
-    "Italy": [
-      "Rome - 5 Days, 4 Nights",
-      "Venice - 5 Days, 4 Nights",
-      "Milan - 5 Days, 4 Nights",
-      "Naples - 5 Days, 4 Nights",
-      "Florence - 5 Days, 4 Nights",
-      "Amalfi Coast - 5 Days, 4 Nights"
-    ],
-    "Japan": ["Kyoto - 6 Days, 5 Nights"],
-    "Malaysia": ["Kuala Lumpur - 6 Days, 5 Nights"],
-    "Maldives": ["Maldives - 6 Days, 5 Nights"],
-    "Mexico": [
-      "Cabo San Lucas - 5 Days, 4 Nights",
-      "Puerto Vallarta - 6 Days, 5 Nights",
-      "Cancun - 6 Days, 5 Nights"
-    ],
-    "Netherlands": ["Amsterdam, Netherlands - 4 Days, 3 Nights"],
-    "New Zealand": [
-      "Auckland - 5 Days, 4 Nights",
-      "Bay Of Plenty and Rotorua - 5 Days, 4 Nights",
-      "Christchurch - 5 Days, 4 Nights",
-      "Dunedin - 5 Days, 4 Nights",
-      "Marlborough - 5 Days, 4 Nights",
-      "Wellington - 5 Days, 4 Nights"
-    ],
-    "Philippines": [
-      "Bohol - 6 Days, 5 Nights",
-      "Boracay - 5 Days, 4 Nights"
-    ],
-    "Portugal": ["Lisbon - 5 Days, 4 Nights"],
-    "Puerto Rico": ["San Juan - 5 Days, 4 Nights"],
-    "Saudi Arabia": ["Mecca - 4 Days, 3 Nights"],
-    "Singapore": ["Singapore - 5 Days, 4 Nights"],
-    "South Africa": ["Cape Town - 5 Days, 4 Nights"],
-    "South Korea": ["Seoul - 6 Days, 5 Nights"],
-    "Spain": [
-      "Barcelona - 5 Days, 4 Nights",
-      "Benidorm - 5 Days, 4 Nights",
-      "Madrid - 5 Days, 4 Nights",
-      "Majorca - 5 Days, 4 Nights",
-      "Tenerife - 5 Days, 4 Nights"
-    ],
-    "Sweden": ["Stockholm - 5 Days, 4 Nights"],
-    "Tanzania": ["Zanzibar - 5 Days, 4 Nights"],
-    "Thailand": [
-      "Bangkok - 5 Days, 4 Nights",
-      "Koh Samui - 8 Days, 7 Nights",
-      "Pattaya - 6 Days, 5 Nights",
-      "Phuket - 8 Days, 7 Nights"
-    ],
-    "Turkey": [
-      "Antalya - 4 Days, 3 Nights",
-      "Bodrum - 5 Days, 4 Nights",
-      "Istanbul - 5 Days, 4 Nights"
-    ],
-    "UAE": ["Dubai, UAE - 5 Days, 4 Nights"],
-    "United Kingdom": [
-      "Edinburgh - 4 Days, 3 Nights",
-      "Glasgow - 4 Days, 3 Nights",
-      "London - 4 Days, 3 Nights"
-    ],
-    "Vanuatu": ["Vanuatu - 5 Days, 4 Nights"]
+      "Brisbane, QLD - 4 Days, 3 Nights"
+    ]
   };
 
-  // Get DOM elements
-  const countrySelect = document.getElementById("country");
-  const citySelect = document.getElementById("city");
-  const searchBox = document.getElementById("search");
-  const promoInput = document.getElementById("promo");
-  const priceDisplay = document.getElementById("priceDisplay");
-  const payBtn = document.getElementById("payBtn");
+  const countrySelect = document.getElementById('country');
+  const citySelect = document.getElementById('city');
+  const searchBox = document.getElementById('search');
+  const promoInput = document.getElementById('promo');
+  const priceDisplay = document.getElementById('priceDisplay');
+  const payBtn = document.getElementById('payBtn');
 
-  // Custom sorting function to maintain the specific order
-  function getSortedCountries() {
-    const specialOrder = ["Special Vouchers", "Cruise Destinations", "United States"];
-    const otherCountries = Object.keys(destinations)
-      .filter(country => !specialOrder.includes(country))
-      .sort((a, b) => a.localeCompare(b));
-    
-    return [...specialOrder, ...otherCountries];
-  }
-
-  // Populate countries with custom order
-  function populateCountries(filterFn) {
-    countrySelect.innerHTML = "<option value=''>Select Country / Region</option>";
-    const sortedCountries = getSortedCountries();
-    
-    sortedCountries.forEach(country => {
-      if (!filterFn || filterFn(country)) {
-        const option = document.createElement("option");
-        option.value = country; 
-        option.textContent = country;
-        countrySelect.appendChild(option);
-      }
+  // Populate countries
+  function populateCountries() {
+    countrySelect.innerHTML = '<option value="">Select Country</option>';
+    Object.keys(destinations).forEach(country => {
+      const option = document.createElement('option');
+      option.value = country;
+      option.textContent = country;
+      countrySelect.appendChild(option);
     });
   }
 
-  // Populate cities for a country
+  // Populate cities
   function populateCities(country) {
-    citySelect.innerHTML = "<option value=''>Select Destination</option>";
-    if (!country) return;
-    
-    const cities = destinations[country] || [];
-    cities.sort((a, b) => a.localeCompare(b)).forEach(city => {
-      const option = document.createElement("option");
-      option.value = city; 
-      option.textContent = city;
-      citySelect.appendChild(option);
-    });
+    citySelect.innerHTML = '<option value="">Select Destination</option>';
+    if (country && destinations[country]) {
+      destinations[country].forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        option.textContent = city;
+        citySelect.appendChild(option);
+      });
+    }
   }
 
-  // CORRECTED PRICE LOGIC
+  // Calculate price
   function computePrice(country) {
     if (!country) return 0;
-    
-    // Base prices
-    let basePrice;
-    if (country === "Special Vouchers" || country === "Cruise Destinations") {
-      basePrice = 100; // Special vouchers and cruise vouchers are $100
-    } else {
-      basePrice = 75; // All regular vouchers are $75
-    }
-
-    // Apply promo codes
-    const promo = (promoInput.value || "").trim().toLowerCase();
-    
-    // thatsfamily - 50% off any voucher
-    if (promo === "thatsfamily") {
-      return Math.round(basePrice * 0.5);
-    }
-    
-    // Special voucher/cruise promo code
-    if ((country === "Special Vouchers" || country === "Cruise Destinations") && promo === "thats75") {
-      return 75;
-    }
-    
-    // Regular voucher promo code
-    if (country !== "Special Vouchers" && country !== "Cruise Destinations" && promo === "thats50") {
-      return 50;
-    }
-    
-    return basePrice;
+    let base = (country === "Special Vouchers" || country === "Cruise Destinations") ? 100 : 75;
+    const promo = promoInput.value.toLowerCase();
+    if (promo === "thats50" && base === 75) return 50;
+    if (promo === "thats75" && base === 100) return 75;
+    if (promo === "thatsfamily") return Math.round(base * 0.5);
+    return base;
   }
 
-  function updateDisplayedPrice() {
-    const price = computePrice(countrySelect.value);
-    priceDisplay.textContent = `Voucher Price: $${price}`;
+  function updatePrice() {
+    priceDisplay.textContent = `Voucher Price: $${computePrice(countrySelect.value)}`;
   }
 
-  // SMART SEARCH FUNCTION
-  searchBox.addEventListener("input", (e) => {
-    const query = (e.target.value || "").trim().toLowerCase();
-    
+  // Event listeners
+  countrySelect.addEventListener('change', function() {
+    populateCities(this.value);
+    updatePrice();
+  });
+
+  promoInput.addEventListener('input', updatePrice);
+  citySelect.addEventListener('change', updatePrice);
+
+  // Search functionality
+  searchBox.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
     if (!query) {
       populateCountries();
-      citySelect.innerHTML = "<option value=''>Select Destination</option>";
       return;
     }
-
-    populateCountries(country => {
-      // Search country names
-      if (country.toLowerCase().includes(query)) return true;
-      
-      // Search city/destination names within this country
-      if (destinations[country]) {
-        return destinations[country].some(city => 
-          city.toLowerCase().includes(query)
-        );
+    populateCountries();
+    // Simple search - just filter the dropdown
+    Array.from(countrySelect.options).forEach(option => {
+      if (option.value && !option.value.toLowerCase().includes(query)) {
+        option.style.display = 'none';
+      } else {
+        option.style.display = '';
       }
-      
-      return false;
     });
   });
 
-  // Event listeners
-  countrySelect.addEventListener("change", () => {
-    populateCities(countrySelect.value);
-    updateDisplayedPrice();
-  });
-  
-  citySelect.addEventListener("change", updateDisplayedPrice);
-  promoInput.addEventListener("input", updateDisplayedPrice);
-
-  // Initialize the form
-  populateCountries();
-  updateDisplayedPrice();
-
-  // DEBUG PAYMENT BUTTON CODE
-  payBtn.addEventListener("click", async ()=>{
+  // Payment handler
+  payBtn.addEventListener('click', async function() {
     const country = countrySelect.value;
     const city = citySelect.value;
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const promo = document.getElementById("promo").value.trim();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
     const price = computePrice(country);
 
-    console.log("Form data:", { country, city, name, email, phone, promo, price });
-    console.log("Backend URL:", backendURL);
-
     if (!country || !city || !email) {
-      alert("Please choose country, destination and enter an email.");
+      alert('Please fill in all required fields');
       return;
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-
-    payBtn.disabled = true;
-    payBtn.textContent = "Processing...";
-    payBtn.classList.add('loading');
+    this.disabled = true;
+    this.textContent = 'Processing...';
 
     try {
-      console.log("Sending request to backend...");
-      
-      const response = await fetch(`${backendURL}/api/create-checkout-session`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ 
-          country, 
-          city, 
-          name, 
-          email, 
-          phone, 
-          promo,
-          price 
-        })
+      console.log('Sending payment request...');
+      const response = await fetch('https://awezomevouchers-backend.vercel.app/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country, city, name, email, phone, price })
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response OK?", response.ok);
-      
       const data = await response.json();
-      console.log("Response data:", data);
       
-      if (!response.ok) {
-        console.error("Backend returned error:", data);
-        alert("Error: " + (data.error || "Check console for details"));
-        resetPayButton();
-        return;
-      }
-
       if (data.url) {
-        console.log("Redirecting to Stripe checkout...");
         window.location.href = data.url;
       } else {
-        alert("No payment URL received");
-        resetPayButton();
+        alert('Payment error: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
-      console.error("Network error details:", error);
-      console.error("Error type:", error.name);
-      console.error("Error message:", error.message);
-      alert("Cannot connect to payment service. Please try again later.");
-      resetPayButton();
+      console.error('Payment failed:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      this.disabled = false;
+      this.textContent = 'Pay with Card / Apple Pay';
     }
   });
 
-  function resetPayButton() {
-    payBtn.disabled = false;
-    payBtn.textContent = "Pay with Card / Apple Pay";
-    payBtn.classList.remove('loading');
-  }
+  // Initialize
+  populateCountries();
+  updatePrice();
   </script>
 </body>
 </html>
