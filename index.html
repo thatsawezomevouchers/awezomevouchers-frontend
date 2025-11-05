@@ -1,220 +1,231 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>Awezome Vacation Vouchers</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      font-family: system-ui, Segoe UI, Arial;
-      background: #f4f6f8;
-      padding: 24px;
-      display: flex;
-      justify-content: center;
-    }
-    .card {
-      width: 100%;
-      max-width: 640px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
-    }
-    h1 {
-      margin: 0 0 10px;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: 600;
-    }
-    input,
-    select,
-    button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd7de;
-      font-size: 15px;
-    }
-    #priceDisplay {
-      margin-top: 14px;
-      font-weight: 700;
-      text-align: center;
-    }
-    button {
-      background: #0070f3;
-      color: white;
-      border: 0;
-      cursor: pointer;
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Awezome Vacation Vouchers</h1>
+  <head>
+    <meta charset="utf-8" />
+    <title>Awezome Vacation Vouchers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: system-ui, Arial, sans-serif;
+        background: #f5f7fa;
+        padding: 24px;
+        display: flex;
+        justify-content: center;
+      }
+      .card {
+        width: 100%;
+        max-width: 640px;
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 24px;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: 600;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 15px;
+        margin-top: 4px;
+      }
+      #priceDisplay {
+        margin-top: 14px;
+        font-weight: bold;
+        text-align: center;
+      }
+      button {
+        background: #0070f3;
+        color: white;
+        border: 0;
+        cursor: pointer;
+        font-weight: 600;
+        margin-top: 10px;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
 
-    <label for="search">Search (country or city)</label>
-    <input id="search" placeholder="Start typing country or city name..." />
+  <body>
+    <div class="card">
+      <h1>Awezome Vacation Vouchers</h1>
 
-    <label for="country">Country / Region</label>
-    <select id="country">
-      <option value="">Select Country / Region</option>
-    </select>
+      <label for="search">Search (country or city)</label>
+      <input id="search" placeholder="Start typing country or city name..." />
 
-    <label for="city">City / Destination</label>
-    <select id="city">
-      <option value="">Select Destination</option>
-    </select>
+      <label for="country">Country / Region</label>
+      <select id="country">
+        <option value="">Select Country / Region</option>
+      </select>
 
-    <label for="promo">Promo code (optional)</label>
-    <input id="promo" placeholder="Enter promo code" />
+      <label for="city">City / Destination</label>
+      <select id="city">
+        <option value="">Select Destination</option>
+      </select>
 
-    <div id="priceDisplay">Voucher Price: $0</div>
+      <label for="promo">Promo code (optional)</label>
+      <input id="promo" placeholder="Enter promo code" />
 
-    <button id="payBtn">Pay with Card / Apple Pay</button>
-    <p style="margin-top:10px;font-size:13px;color:#666;">
-      If Apple Pay doesn't appear on your device, customers can also pay via your external channels.
-    </p>
-  </div>
+      <div id="priceDisplay">Voucher Price: $0</div>
 
-  <script src="https://js.stripe.com/v3/"></script>
-  <script>
-    // ===== CONFIG =====
-    const STRIPE_PUBLISHABLE_KEY = "pk_test_51SpY0o4fSKyDUsuM29eSoNNbBb3AGRt4dZ4Z5rhg4geejvy78Wk3Sto6nYHhEwNukCjMhn1ql4fs1T7tQ5Q89J7dd2bD8";
-    const backendURL = "https://awezomevouchers-backend.vercel.app"; // ✅ FIXED
+      <button id="payBtn">Pay with Card / Apple Pay</button>
 
-    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+      <p style="font-size:13px;color:#666;margin-top:10px;">
+        If Apple Pay doesn't appear on your device, you can also pay using your other available payment methods.
+      </p>
+    </div>
 
-    // ===== Promo pricing logic =====
-    function computeClientPrice(country, city, promo) {
-      let base = 75;
-      if (
-        country === "Special Vouchers" ||
-        country === "Cruise Destinations" ||
-        country === "Cruise Vacations"
-      )
-        base = 100;
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      // ===== CONFIG =====
+      const STRIPE_PUBLISHABLE_KEY =
+        "pk_test_51SpY0o4fSKyDUsuM29eSoNNbBb3AGRt4dZ4Z5rhg4geejvy78Wk3Sto6nYHhEwNukCjMhn1ql4fs1T7tQ5Q89J7dd2bD8";
+      const backendURL = "https://awezomevouchers-backend.vercel.app"; // ✅ make sure this is correct
 
-      if (!promo) return base;
-      const p = promo.trim().toLowerCase();
-      if (p === "thats50" && base === 75) return 50;
-      if (p === "thats75" && base === 100) return 75;
-      if (p === "thatsfamily") return Math.round(base * 0.5);
-      return base;
-    }
+      const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
-    // ===== DOM Elements =====
-    const countrySelect = document.getElementById("country");
-    const citySelect = document.getElementById("city");
-    const promoInput = document.getElementById("promo");
-    const priceDisplay = document.getElementById("priceDisplay");
-    const searchBox = document.getElementById("search");
-    const payBtn = document.getElementById("payBtn");
-
-    // ===== Destinations =====
-    const destinations = {
-      "Belgium": ["Brussels (4 Days, 3 Nights)"],
-      "Brazil": ["Rio de Janeiro (5 Days, 4 Nights)"],
-      "France": ["Paris (5 Days, 4 Nights)"],
-      "United States": ["New York (4 Days, 3 Nights)", "Miami (4 Days, 3 Nights)"],
-      "Australia": ["Sydney (5 Days, 4 Nights)", "Melbourne (4 Days, 3 Nights)"]
-    };
-
-    function populateCountryList(filterFn) {
-      const keys = Object.keys(destinations).sort((a, b) => a.localeCompare(b));
-      countrySelect.innerHTML = '<option value="">Select Country / Region</option>';
-      keys.forEach((country) => {
-        if (!filterFn || filterFn(country)) {
-          const o = document.createElement("option");
-          o.value = country;
-          o.textContent = country;
-          countrySelect.appendChild(o);
+      // ===== PRICING =====
+      function computePrice(country, promo) {
+        let base = 75;
+        if (
+          ["Special Vouchers", "Cruise Destinations", "Cruise Vacations"].includes(country)
+        ) {
+          base = 100;
         }
-      });
-    }
 
-    function populateCityList(country) {
-      citySelect.innerHTML = '<option value="">Select Destination</option>';
-      if (!country) return;
-      const cities = destinations[country] || [];
-      cities.forEach((c) => {
-        const o = document.createElement("option");
-        o.value = c;
-        o.textContent = c;
-        citySelect.appendChild(o);
-      });
-    }
+        if (!promo) return base;
 
-    populateCountryList();
+        const code = promo.trim().toLowerCase();
+        if (code === "thats50" && base === 75) return 50;
+        if (code === "thats75" && base === 100) return 75;
+        if (code === "thatsfamily") return Math.round(base * 0.5);
 
-    function updateDisplayedPrice() {
-      const country = countrySelect.value;
-      const city = citySelect.value;
-      const promo = promoInput.value.trim();
-      const price = computeClientPrice(country, city, promo);
-      priceDisplay.textContent = `Voucher Price: $${price}`;
-    }
-
-    countrySelect.addEventListener("change", () => {
-      populateCityList(countrySelect.value);
-      updateDisplayedPrice();
-    });
-    citySelect.addEventListener("change", updateDisplayedPrice);
-    promoInput.addEventListener("input", updateDisplayedPrice);
-
-    payBtn.addEventListener("click", async () => {
-      payBtn.disabled = true;
-
-      const country = countrySelect.value;
-      const city = citySelect.value;
-      const promo = promoInput.value.trim();
-
-      if (!country) {
-        alert("Please choose a country/region.");
-        payBtn.disabled = false;
-        return;
-      }
-      if (!city) {
-        alert("Please choose a destination.");
-        payBtn.disabled = false;
-        return;
+        return base;
       }
 
-      try {
-        const price = computeClientPrice(country, city, promo);
-        const response = await fetch(`${backendURL}/create-checkout-session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            price,
-            name: `${country} - ${city}`,
-            email: "none@none.com",
-            phone: "N/A",
-          }),
+      // ===== DESTINATIONS =====
+      const destinations = {
+        "Belgium": ["Brussels (4 Days, 3 Nights)"],
+        "Brazil": ["Rio de Janeiro (5 Days, 4 Nights)"],
+        "Canada": ["Toronto (4 Days, 3 Nights)", "Vancouver (5 Days, 4 Nights)"],
+        "France": ["Paris (5 Days, 4 Nights)", "Nice (4 Days, 3 Nights)"],
+        "Italy": ["Rome (5 Days, 4 Nights)", "Venice (4 Days, 3 Nights)"],
+        "Japan": ["Tokyo (5 Days, 4 Nights)", "Osaka (4 Days, 3 Nights)"],
+        "Mexico": ["Cancun (5 Days, 4 Nights)", "Mexico City (4 Days, 3 Nights)"],
+        "Spain": ["Barcelona (5 Days, 4 Nights)", "Madrid (4 Days, 3 Nights)"],
+        "United Kingdom": ["London (5 Days, 4 Nights)"],
+        "United States": ["New York (4 Days, 3 Nights)", "Miami (4 Days, 3 Nights)", "Los Angeles (5 Days, 4 Nights)"],
+        "Australia": ["Sydney (5 Days, 4 Nights)", "Melbourne (4 Days, 3 Nights)"],
+        "Special Vouchers": ["Caribbean Getaway", "European Escape"],
+        "Cruise Vacations": ["Mediterranean Cruise (7 Nights)", "Bahamas Cruise (5 Nights)"]
+      };
+
+      // ===== DOM ELEMENTS =====
+      const countrySelect = document.getElementById("country");
+      const citySelect = document.getElementById("city");
+      const promoInput = document.getElementById("promo");
+      const priceDisplay = document.getElementById("priceDisplay");
+      const payBtn = document.getElementById("payBtn");
+      const searchBox = document.getElementById("search");
+
+      // ===== POPULATE DROPDOWNS =====
+      function populateCountries(filter = "") {
+        countrySelect.innerHTML = '<option value="">Select Country / Region</option>';
+        const keys = Object.keys(destinations).sort();
+        keys.forEach((country) => {
+          if (country.toLowerCase().includes(filter.toLowerCase())) {
+            const opt = document.createElement("option");
+            opt.value = country;
+            opt.textContent = country;
+            countrySelect.appendChild(opt);
+          }
         });
+      }
 
-        const json = await response.json();
-        if (!response.ok) {
-          alert("Backend error: " + (json.error || "unknown"));
+      function populateCities(country) {
+        citySelect.innerHTML = '<option value="">Select Destination</option>';
+        if (!country || !destinations[country]) return;
+        destinations[country].forEach((city) => {
+          const opt = document.createElement("option");
+          opt.value = city;
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+      }
+
+      function updatePrice() {
+        const price = computePrice(countrySelect.value, promoInput.value);
+        priceDisplay.textContent = `Voucher Price: $${price}`;
+      }
+
+      // ===== EVENT LISTENERS =====
+      searchBox.addEventListener("input", (e) => {
+        populateCountries(e.target.value);
+      });
+
+      countrySelect.addEventListener("change", (e) => {
+        populateCities(e.target.value);
+        updatePrice();
+      });
+
+      citySelect.addEventListener("change", updatePrice);
+      promoInput.addEventListener("input", updatePrice);
+
+      payBtn.addEventListener("click", async () => {
+        payBtn.disabled = true;
+        const country = countrySelect.value;
+        const city = citySelect.value;
+        const promo = promoInput.value;
+        if (!country || !city) {
+          alert("Please select a country and destination.");
           payBtn.disabled = false;
           return;
         }
 
-        const { sessionId } = json;
-        await stripe.redirectToCheckout({ sessionId });
-      } catch (err) {
-        console.error(err);
-        alert("Network error contacting backend.");
-        payBtn.disabled = false;
-      }
-    });
+        try {
+          const price = computePrice(country, promo);
+          const response = await fetch(`${backendURL}/create-checkout-session`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              price,
+              name: `${country} - ${city}`,
+              email: "none@none.com",
+              phone: "N/A",
+            }),
+          });
 
-    updateDisplayedPrice();
-  </script>
-</body>
+          const data = await response.json();
+          if (!response.ok) {
+            alert("Backend error: " + (data.error || "Unknown error"));
+            payBtn.disabled = false;
+            return;
+          }
+
+          const { sessionId } = data;
+          await stripe.redirectToCheckout({ sessionId });
+        } catch (err) {
+          console.error(err);
+          alert("Network error contacting backend.");
+          payBtn.disabled = false;
+        }
+      });
+
+      populateCountries();
+      updatePrice();
+    </script>
+  </body>
 </html>
